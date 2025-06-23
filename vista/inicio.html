@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block contenido %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/inicio.css') }}">
+<div class="dashboard">
+    <div class="welcome-card">
+        <h1>Bienvenido al Sistema de Gestión de Librería</h1>
+        <p class="subtitle">Administra eficientemente tu catálogo de libros, autores y editoriales</p>
+        
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-icon">📚</div>
+                <div class="stat-value">150</div>
+                <div class="stat-label">Libros registrados</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">✍️</div>
+                <div class="stat-value">45</div>
+                <div class="stat-label">Autores</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">🏢</div>
+                <div class="stat-value">12</div>
+                <div class="stat-label">Editoriales</div>
+            </div>
+        </div>
+        
+        <div class="quick-actions">
+            <h3>Acciones rápidas:</h3>
+            <div class="action-buttons">
+                <a href="/libro" class="action-btn">➕ Añadir Libro</a>
+                <a href="/autor" class="action-btn">➕ Añadir Autor</a>
+                <a href="/editorial" class="action-btn">➕ Añadir Editorial</a>
+                <a href="/uiFactura" class="action-btn">➕ Ir a Facturación</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="recent-activity">
+        <h2>Actividad Reciente</h2>
+        <div class="activity-list">
+            <div class="activity-item">
+                <div class="activity-icon">📖</div>
+                <div class="activity-text">Se agregó "Cien años de soledad" al catálogo</div>
+                <div class="activity-time">Hace 2 horas</div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">✍️</div>
+                <div class="activity-text">Nuevo autor registrado: Gabriel García Márquez</div>
+                <div class="activity-time">Ayer</div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">🏢</div>
+                <div class="activity-text">Editorial "Penguin Random House" actualizada</div>
+                <div class="activity-time">3 días atrás</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

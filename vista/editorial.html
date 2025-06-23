@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Editorial{% endblock %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/biblioteca.css') }}">
+{% block contenido %}
+<h2>Formulario Editorial</h2>
+<div class="card">
+    <div class="id-display">ID:<span id="id_editorial">ID003</div>
+    <form class="formulario">
+        <div class="form-group">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre">
+        </div>
+        <div class="form-group">
+            <label for="tipo">Tipo:</label>
+                <select id="genero" name="genero" required>
+                    <option value="">Seleccione tipo de editorial...</option>
+                    <option value="tradicional">Tradicional</option>
+                    <option value="independiente">Independiente</option>
+                    <option value="universitaria">Universitaria</option>
+                    <option value="estatal">Estatal</option>
+                    <option value="coedicion">Coedicion</option>
+                </select>
+        </div>
+        <div class="form-group">
+            <label for="contacto">Contacto:</label>
+            <input type="text" id="contacto" name="contacto">
+        </div>
+        <div class="button-group">
+            <button type="submit" class="btn-primary">Guardar</button>
+            <button type="reset" class="btn-secondary">Limpiar</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema Integrado{% endblock %}</title>
+    
+    <!-- CSS común -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS específico por página -->
+    {% block css %}{% endblock %}
+</head>
+<body>
+    <div class="topbar">
+        <div class="user-info">
+            <i class="fas fa-user-shield"></i> <span>Admin</span>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <div class="logo" onclick="window.location.href='/'">Sistema Biblioteca</div>
+        <a href="/autor" {% if request.path == '/autor' %}class="active"{% endif %}>Autor</a>
+        <a href="/libro" {% if request.path == '/libro' %}class="active"{% endif %}>Libro</a>
+        <a href="/editorial" {% if request.path == '/editorial' %}class="active"{% endif %}>Editorial</a>
+        <a href="/uiFactura" {% if request.path == '/uiFactura' %}class="active"{% endif %}>Facturación</a>
+        <a href="/Detalle_Factura" {% if request.path == '/Detalle_Factura' %}class="active"{% endif %}>Detalle Factura</a>
+    </div>
+
+    <div class="contenido">
+        {% block contenido %}{% endblock %}
+    </div>
+
+    <!-- JS común -->
+    <script src="{{ url_for('static', filename='js/uiFactura.js') }}"></script>
+    
+    <!-- JS específico por página -->
+    {% block js %}{% endblock %}
+</body>
+</html>
+

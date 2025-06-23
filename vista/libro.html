@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Libro{% endblock %}
+{% block contenido %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/biblioteca.css') }}">
+<h2>Formulario Libro</h2>
+<div class="card">
+    <div class="id-display">ID: <span id="id_libro">ID002</span></div>
+    <form class="formulario">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="titulo">Título:</label>
+                <input type="text" id="titulo" name="titulo" required>
+            </div>
+            <div class="form-group">
+                <label for="isbn">ISBN:</label>
+                <input type="text" id="isbn" name="isbn" pattern="[0-9]{13}" title="Ingrese 13 dígitos numéricos">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="editorial">Editorial:</label>
+                <select id="editorial" name="editorial" required>
+                    <option value="">Seleccione editorial...</option>
+                    <option value="1">Editorial A</option>
+                    <option value="2">Editorial B</option>
+                    <option value="3">Editorial C</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="idioma">Idioma:</label>
+                <select id="idioma" name="idioma" required>
+                    <option value="">Seleccione idioma...</option>
+                    <option value="es">Español</option>
+                    <option value="en">Inglés</option>
+                    <option value="fr">Francés</option>
+                    <option value="de">Alemán</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="genero">Género:</label>
+                <select id="genero" name="genero" required>
+                    <option value="">Seleccione género...</option>
+                    <option value="novela">Novela</option>
+                    <option value="ciencia-ficcion">Ciencia Ficción</option>
+                    <option value="fantasia">Fantasía</option>
+                    <option value="historia">Historia</option>
+                    <option value="tecnico">Técnico</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="edicion">Edición:</label>
+                <input type="number" id="edicion" name="edicion" min="1" value="1">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="formato">Formato:</label>
+            <div class="radio-group">
+                <label><input type="radio" name="formato" value="tapa-dura" checked> Tapa dura</label>
+                <label><input type="radio" name="formato" value="tapa-blanda"> Tapa blanda</label>
+                <label><input type="radio" name="formato" value="digital"> Digital</label>
+                <label><input type="radio" name="formato" value="audiolibro"> Audiolibro</label>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button type="submit" class="btn-primary">Guardar</button>
+            <button type="reset" class="btn-secondary">Limpiar</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
