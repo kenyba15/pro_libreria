@@ -1,4 +1,19 @@
-/* Estilos generales */
+/* Estilo base para inputs y selects */
+input[type="text"],
+input[type="number"],
+select {
+  width: 100%;
+  height: 42px;
+  padding: 10px;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  background-color: white;
+}
+
+
 body {
     font-family: 'Poppins', sans-serif;
     background-color: #f5f7fa;
@@ -169,4 +184,84 @@ body {
     margin-top: 0;             /* quita el margen vertical heredado */
     margin-right: 15px;        /* espacio entre cada opción */
     cursor: pointer;
+}
+
+/* Estilos para Select2 */
+.select2-container {
+    width: 100% !important; /* Forzar ancho completo */
+
+}
+.select2-container--default .select2-selection--single {
+    height: 42px !important; /* Altura igual a los inputs */
+    border: 1px solid #ccc !important; /* Borde igual a los inputs */
+    border-radius: 4px !important; /* Bordes redondeados */
+    display: flex !important; /* Usar flexbox para centrar el contenido */
+    align-items: center !important; /* Centrar verticalmente */
+    padding: 0 10px !important; /* Padding horizontal */
+    box-sizing: border-box !important; /* Para que el padding no afecte el ancho */
+}
+.select2-selection__rendered {
+    line-height: 42px !important; /* Asegúrate de que el texto esté centrado verticalmente */
+    padding-left: 0 !important; /* Eliminar padding izquierdo extra */
+    color: #333 !important; /* Color del texto */
+}
+.select2-selection__arrow {
+    height: 42px !important; /* Altura de la flecha */
+    top: 0 !important; /* Alinear la flecha al borde superior */
+}
+/* Asegúrate de que el dropdown tenga el mismo estilo */
+.select2-container--default .select2-results {
+    font-family: 'Poppins', sans-serif; /* Fuente consistente */
+    font-size: 14px; /* Tamaño de fuente consistente */
+}
+
+.select2-container--default .select2-selection--single {
+    height: 50px; /* Aumenta la altura si es necesario */
+}
+
+/* Estilos para errores - ACTUALIZADO */
+.error-msg {
+    color: #d32f2f !important; /* !important para forzar el color */
+    font-size: 0.85rem;
+    margin-top: 4px;
+    min-height: 1.2em;
+    display: block; /* Asegura que ocupa su propia línea */
+}
+
+/* Resaltar campos con error - ACTUALIZADO */
+input.invalid, 
+select.invalid,
+textarea.invalid {
+    border-color: #d32f2f !important;
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25) !important;
+}
+
+/* Para Select2 con error */
+.select2-selection.invalid {
+    border: 1px solid #d32f2f !important;
+}
+
+/* Estilo para botón deshabilitado */
+button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Mejorar visibilidad de errores para selects */
+.select2-container + .error-msg {
+    display: block;
+    margin-top: 5px;
+}
+
+/* Asegurar que los mensajes de error sean visibles */
+.form-group {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.error-msg {
+    position: absolute;
+    bottom: -18px;
+    left: 0;
+    width: 100%;
 }
