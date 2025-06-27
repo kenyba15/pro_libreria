@@ -103,18 +103,21 @@ label {
     margin-top: 10px; /* Espaciado superior */
 }
 
-/* Estilos para inputs */
+/* Estilo base para inputs y selects */
 input[type="text"],
 input[type="number"],
 select {
   width: 100%;
+  height: 42px;
   padding: 10px;
-  margin-top: 5px;
-  margin-bottom: 10px; /* espacio abajo */
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
   border: 1px solid #ccc;
   border-radius: 4px;
-  box-sizing: border-box; /* para que padding y border no aumenten el ancho */
+  box-sizing: border-box;
+  background-color: white;
 }
+
 
 
 /* Estilos para grupos de formularios */

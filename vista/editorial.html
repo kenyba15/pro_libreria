@@ -1,30 +1,43 @@
 {% extends 'base.html' %}
 
 {% block title %}Editorial{% endblock %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/biblioteca.css') }}">
 {% block contenido %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/biblioteca.css') }}">
 <h2>Formulario Editorial</h2>
 <div class="card">
-    <div class="id-display">ID:<span id="id_editorial">ID003</div>
-    <form class="formulario">
-        <div class="form-group">
-            <label for="nombre">Nombre:</label>
-            <input type="text" id="nombre" name="nombre">
-        </div>
-        <div class="form-group">
-            <label for="tipo">Tipo:</label>
-                <select id="genero" name="genero" required>
+    <div class="id-display">ID: <span id="id_editorial">ID003</span></div>
+    <!-- Agregar ID y clase para validación -->
+    <form id="form-editorial" class="formulario validated-form" autocomplete="off">
+        <div class="form-row">
+            <div class="form-group" autocomplete="off">
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" autocomplete="off">
+                <div class="error-msg" id="error-nombre"></div>
+            </div>
+            <div class="form-group" autocomplete="off">
+                <label for="tipo">Tipo:</label>
+                <select id="tipo" name="tipo">
                     <option value="">Seleccione tipo de editorial...</option>
                     <option value="tradicional">Tradicional</option>
                     <option value="independiente">Independiente</option>
                     <option value="universitaria">Universitaria</option>
                     <option value="estatal">Estatal</option>
-                    <option value="coedicion">Coedicion</option>
+                    <option value="coedicion">Coedición</option>
                 </select>
+                <div class="error-msg" id="error-tipo"></div>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="contacto">Contacto:</label>
-            <input type="text" id="contacto" name="contacto">
+        <div class="form-row">
+            <div class="form-group" autocomplete="off">
+                <label for="web_p">Sitio web:</label>
+                <input type="text" id="web_p" name="web_p" autocomplete="off" placeholder="https://ejemplo.com">
+                <div class="error-msg" id="error-web_p"></div>
+            </div>
+            <div class="form-group" autocomplete="off">
+                <label for="correo">Correo:</label>
+                <input type="text" id="correo" name="correo" autocomplete="off" placeholder="ejemplo@editorial.com">
+                <div class="error-msg" id="error-correo"></div>
+            </div>
         </div>
         <div class="button-group">
             <button type="submit" class="btn-primary">Guardar</button>
@@ -32,4 +45,20 @@
         </div>
     </form>
 </div>
+
+<!-- Incluir los mismos scripts de validación que para libro -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
+<script src="{{ url_for('static', filename='js/maneFor.js') }}"></script>
+
+<script>
+// Inicialización para Select2 si decides usarlo en el futuro
+$(document).ready(function() {
+    // Si quieres hacer el campo de tipo más bonito con Select2
+    // $('#tipo').select2({
+    //     placeholder: "Seleccione tipo de editorial",
+    //     allowClear: false
+    // });
+});
+</script>
 {% endblock %}
