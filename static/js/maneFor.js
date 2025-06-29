@@ -131,7 +131,7 @@ function validarFormulario(formId) {
             break;
             
             case 'form-editorial':
-            errors.nombre = validarRequerido(document.getElementById('nombre').value, 
+            errors.nombre = validarNombre(document.getElementById('nombre').value, 
                 'nombre'
             );
             
@@ -160,7 +160,7 @@ function validarFormulario(formId) {
             
 case 'form-autor':
     // Validar nombre
-    errors.nombre = validarRequerido(
+    errors.nombre = validarNombre(
         document.getElementById('nombre').value, 
         'nombre'
     );
