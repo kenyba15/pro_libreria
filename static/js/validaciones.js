@@ -8,6 +8,22 @@ function validarRequerido(valor, campo) {
     return '';
 }
 
+function validarNombre(nombre) {
+    // Acepta letras (mayúsculas y minúsculas), espacios, tildes y ñ
+    const regex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
+
+    if (nombre.trim() === "") {
+        return "El nombre no puede estar vacío.";
+    }
+
+    if (!regex.test(nombre)) {
+        return "El nombre solo puede contener letras y espacios.";
+    }
+
+    return "";
+}
+
+
 // Validar selects
 function validarSelect(valor, campo) {
     if (!valor || valor === '') {
@@ -35,7 +51,7 @@ function validarISBN(isbn) {
     }
     
     if (!/^\d{13}$/.test(isbn)) {
-        return 'ISBN inválido (debe tener exactamente 13 dígitos)';
+        return 'ISBN inválido (debe tener exactamente 13 dígitos numéricos)';
     }
     return '';
 }
