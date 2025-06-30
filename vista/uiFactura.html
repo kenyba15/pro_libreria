@@ -21,117 +21,129 @@
     <div class="factura-content">
         <!-- Formulario principal -->
         <div class="factura-form">
-            <div class="form-section">
-                <h2><i class="fas fa-file-alt"></i> Datos de Facturación</h2>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="customer">Cliente *</label>
-                        <div class="select-wrapper">
-                            <select id="customer" name="customer">
-                                <option value="">Seleccione un cliente</option>
-                                <option value="1">Cliente A</option>
-                                <option value="2">Cliente B</option>
-                            </select>
-                            <i class="fas fa-user"></i>
+            <form id="facturaForm" novalidate>
+                <div class="form-section">
+                    <h2><i class="fas fa-file-alt"></i> Datos de Facturación</h2>
+                    
+                    <div class="form-row">
+                        <!-- Cliente -->
+                        <div class="form-group">
+                            <label for="customer">Cliente *</label>
+                            <div class="select-wrapper">
+                                <select id="customer" name="customer">
+                                    <option value="">Seleccione un cliente</option>
+                                    <option value="1">Cliente A</option>
+                                    <option value="2">Cliente B</option>
+                                </select>
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="error-message" id="error-customer"></div>
+                        </div>
+                        <button type="button" id="toggleNewCustomer" class="btn-add">
+                            <i class="fas fa-plus"></i> Nuevo cliente
+                        </button>
+                    </div>
+
+                    <!-- Campos para nuevo cliente (ocultos inicialmente) -->
+                    <div id="newCustomerFields" class="hidden">
+                        <div class="form-row">
+                            <!-- Nombre nuevo cliente -->
+                            <div class="form-group">
+                                <label>Nombre *</label>
+                                <input type="text" id="newCustomerName">
+                                <div class="error-message" id="error-newCustomerName"></div>
+                            </div>
+                            <!-- Email nuevo cliente -->
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="newCustomerEmail">
+                                <div class="error-message" id="error-newCustomerEmail"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Teléfono</label>
+                            <input type="tel" id="newCustomerPhone">
                         </div>
                     </div>
-                    <button type="button" id="toggleNewCustomer" class="btn-add">
-                        <i class="fas fa-plus"></i> Nuevo cliente
+
+                    <!-- Dirección -->
+                    <div class="form-group">
+                        <label>Dirección *</label>
+                        <textarea id="shippingAddress" rows="2"></textarea>
+                        <div class="error-message" id="error-shippingAddress"></div>
+                    </div>
+                </div>
+
+                <!-- Sección de artículos -->
+                <div class="items-section">
+                    <h2><i class="fas fa-boxes"></i> Artículos</h2>
+                    <div id="invoiceItems" class="items-container">
+                        <!-- Los artículos se agregarán aquí con JavaScript -->
+                    </div>
+                    <button type="button" id="addItemBtn" class="btn-add">
+                        <i class="fas fa-plus-circle"></i> Agregar artículo
                     </button>
                 </div>
 
-                <!-- Campos para nuevo cliente (ocultos inicialmente) -->
-                <div id="newCustomerFields" class="hidden">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Nombre *</label>
-                            <input type="text" id="newCustomerName">
+                <!-- Sección de totales -->
+                <div class="totals-section">
+                    <div class="totals-grid">
+                        <div class="total-item">
+                            <label>Subtotal</label>
+                            <input type="text" id="subtotal" value="$0.00" readonly>
                         </div>
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" id="newCustomerEmail">
+                        <div class="total-item">
+                            <label>Impuesto (%)</label>
+                            <input type="number" id="tax" value="16" min="0" max="100">
+                        </div>
+                        <div class="total-item">
+                            <label>Descuento ($)</label>
+                            <input type="number" id="discount" value="0" min="0">
+                        </div>
+                        <div class="total-item highlight">
+                            <label>Total</label>
+                            <input type="text" id="total" value="$0.00" readonly>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label>Teléfono</label>
-                        <input type="tel" id="newCustomerPhone">
+
+                    <!-- Método de pago -->
+                    <div class="payment-methods">
+                        <label>Método de Pago *</label>
+                        <div class="methods-grid">
+                            <label>
+                                <input type="radio" name="paymentMethod" value="efectivo" checked>
+                                <span>Efectivo</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="paymentMethod" value="tarjeta">
+                                <span>Tarjeta</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="paymentMethod" value="transferencia">
+                                <span>Transferencia</span>
+                            </label>
+                        </div>
+                        <div class="error-message" id="error-paymentMethod"></div>
+                    </div>
+
+                    <div class="form-group notes">
+                        <label>Notas</label>
+                        <textarea id="notes" rows="2" placeholder="Agregue notas adicionales aquí..."></textarea>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Dirección *</label>
-                    <textarea id="shippingAddress" rows="2"></textarea>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn-primary" onclick="saveAsDraft()">
+                        <i class="fas fa-save"></i> Guardar borrador
+                    </button>
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-file-export"></i> Generar Factura
+                    </button>
                 </div>
-            </div>
-
-            <!-- Sección de artículos -->
-            <div class="items-section">
-                <h2><i class="fas fa-boxes"></i> Artículos</h2>
-                <div id="invoiceItems" class="items-container">
-                    <!-- Los artículos se agregarán aquí con JavaScript -->
-                </div>
-                <button type="button" id="addItemBtn" class="btn-add">
-                    <i class="fas fa-plus-circle"></i> Agregar artículo
-                </button>
-            </div>
-
-            <!-- Sección de totales -->
-            <div class="totals-section">
-                <div class="totals-grid">
-                    <div class="total-item">
-                        <label>Subtotal</label>
-                        <input type="text" id="subtotal" value="$0.00" readonly>
-                    </div>
-                    <div class="total-item">
-                        <label>Impuesto (%)</label>
-                        <input type="number" id="tax" value="16" min="0" max="100">
-                    </div>
-                    <div class="total-item">
-                        <label>Descuento ($)</label>
-                        <input type="number" id="discount" value="0" min="0">
-                    </div>
-                    <div class="total-item highlight">
-                        <label>Total</label>
-                        <input type="text" id="total" value="$0.00" readonly>
-                    </div>
-                </div>
-
-                <div class="payment-methods">
-                    <label>Método de Pago *</label>
-                    <div class="methods-grid">
-                        <label>
-                            <input type="radio" name="paymentMethod" value="efectivo" checked>
-                            <span>Efectivo</span>
-                        </label>
-                        <label>
-                            <input type="radio" name="paymentMethod" value="tarjeta">
-                            <span>Tarjeta</span>
-                        </label>
-                        <label>
-                            <input type="radio" name="paymentMethod" value="transferencia">
-                            <span>Transferencia</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="form-group notes">
-                    <label>Notas</label>
-                    <textarea id="notes" rows="2" placeholder="Agregue notas adicionales aquí..."></textarea>
-                </div>
-            </div>
-
-            <div class="form-actions">
-                <button type="button" class="btn-secondary">
-                    <i class="fas fa-times"></i> Cancelar
-                </button>
-                <button type="button" class="btn-primary" onclick="saveAsDraft()">
-                    <i class="fas fa-save"></i> Guardar borrador
-                </button>
-                <button type="submit" class="btn-submit">
-                    <i class="fas fa-file-export"></i> Generar Factura
-                </button>
-            </div>
+            </form>
         </div>
 
         <!-- Vista previa -->
