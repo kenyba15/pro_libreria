@@ -158,29 +158,19 @@ function validarFormulario(formId) {
             break;
     
             
-case 'form-autor':
-    // Validar nombre
-    errors.nombre = validarNombre(
-        document.getElementById('nombre').value, 
-        'nombre'
-    );
+            case 'form-autor':
+                errors.nombre = validarNombre(
+                    document.getElementById('nombre').value, 
+                    'nombre'
+                );
 
-    // Validar género
-    errors.genero = validarSelect(
-        document.getElementById('genero').value,
-        'género'
-    );
-
-    // Validar correo
-    const correoValue = document.getElementById('correo').value;
-    if (!correoValue) {
-        errors.correo = 'El correo es obligatorio.';
-    } else {
-        errors.correo = validarEmail(correoValue);
-    }
-    break;
-
-    }
+                const correoValue = document.getElementById('correo').value;
+                if (!correoValue) {
+                    errors.correo = 'El correo es obligatorio.';
+                } else {
+                    errors.correo = validarEmail(correoValue);
+                }
+            }
     
     // Filtrar solo errores con mensaje
     const filteredErrors = {};
