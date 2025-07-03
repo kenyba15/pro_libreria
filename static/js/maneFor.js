@@ -11,18 +11,17 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("Errores encontrados al enviar:", errors);
             
             if (Object.keys(errors).length === 0) {
-            const submitBtn = this.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Guardando...';
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Guardando...';
 
-            console.log('Formulario válido, enviando datos...');
-            
-            this.submit();
-        } else {
-            mostrarErrores(errors); // ← Esto estaba faltando
-        }
+                console.log('Formulario válido, enviando datos...');
+                
+                this.submit();
+            } else {
+                mostrarErrores(errors); // ← Esto estaba faltando
+            }
 
-        });
         
         // Limpiar errores al cambiar campos
         form.querySelectorAll('input, textarea, select').forEach(input => {

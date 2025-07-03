@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from modelo.autorDAO import obtener_autores, insertar_autor, actualizar_autor, eliminar_autor, obtener_autor_por_id
+from modelo.editorialDAO import obtener_editoriales, insertar_editorial, actualizar_editorial, eliminar_editorial, obtener_editorial_por_id
 
 form_bp = Blueprint('form_bp', __name__)
 
@@ -38,9 +39,33 @@ def eliminar_autor_ruta(id_autor):
 def libro():
     return render_template('libro.html')
 
-@form_bp.route('/editorial')
+@form_bp.route('/editorial', methods=['GET', 'POST'])
 def editorial():
-    return render_template('editorial.html')
+    if request.method == 'POST':
+        id_editorial = request.form.get('id_editorial')
+        nombre = request.form.get('nombre')
+        tipo = request.form.get('tipo')
+        sitio_web = request.form.get('sitio_web')
+        correo = request.form.get('correo')
+        if id_editorial and id_editorial.strip() != '':
+            actualizar_editorial(id_editorial, nombre, tipo, sitio_web, correo)
+        else:  # Nuevo
+            insertar_editorial(nombre, tipo, sitio_web, correo)
+        return redirect(url_for('form_bp.editorial'))
+
+    editoriales = obtener_editoriales()
+    return render_template('editorial.html', editoriales=editoriales)
+
+@form_bp.route('/editorial/editar/<int:id_editorial>')
+def editar_editorial(id_editorial):
+    editorial = obtener_editorial_por_id(id_editorial)
+    editoriales = obtener_editoriales()
+    return render_template('editorial.html', editorial=editorial, editoriales=editoriales)
+
+@form_bp.route('/editorial/eliminar/<int:id_editorial>')
+def eliminar_editorial_ruta(id_editorial):
+    eliminar_editorial(id_editorial)
+    return redirect(url_for('form_bp.editorial'))
 
 @form_bp.route('/uiFactura')
 def ui_factura():
