@@ -11,25 +11,17 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("Errores encontrados al enviar:", errors);
             
             if (Object.keys(errors).length === 0) {
-                const submitBtn = this.querySelector('button[type="submit"]');
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Guardando...';
-                
-                console.log('Formulario válido, enviando datos...');
-                
-                const successMessage = 
-                    this.id === 'form-editorial' ? '¡Editorial guardada con éxito! (Simulación)' :
-                    this.id === 'form-autor' ? '¡Autor guardado con éxito! (Simulación)' :
-                    '¡Libro guardado con éxito! (Simulación)';
-                
-                setTimeout(() => {
-                    alert(successMessage);
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Guardar';
-                }, 2000);
-            } else {
-                mostrarErrores(errors);
-            }
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Guardando...';
+
+            console.log('Formulario válido, enviando datos...');
+            
+            this.submit();
+        } else {
+            mostrarErrores(errors); // ← Esto estaba faltando
+        }
+
         });
         
         // Limpiar errores al cambiar campos
