@@ -15,6 +15,7 @@
         </div>
         <form id="form-editorial" class="formulario validated-form" action="{{ url_for('form_bp.editorial') }}" method="POST" autocomplete="off">
             <input type="hidden" name="id_editorial" id="input_id_editorial" value="{{ editorial.id_editorial if editorial else '' }}">
+
             <div class="form-row">
                 <div class="form-group">
                     <label for="nombre">Nombre:</label>

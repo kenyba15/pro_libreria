@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 mostrarErrores(errors); // ← Esto estaba faltando
             }
 
+        });
         
         // Limpiar errores al cambiar campos
         form.querySelectorAll('input, textarea, select').forEach(input => {
@@ -42,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     case 'titulo':
                         error = validarRequerido(valor, campoId);
                         break;
-                    case 'web_p':
+                    case 'sitio_web':
                         error = validarURL(valor);
                         break;
                     case 'correo':
@@ -132,11 +133,11 @@ function validarFormulario(formId) {
             );
             
             // Validar URL
-            const webPValue = document.getElementById('web_p').value;
+            const webPValue = document.getElementById('sitio_web').value;
             if (!webPValue) {
-                errors.web_p = 'El sitio web es obligatorio.';
+                errors.sitio_web = 'El sitio web es obligatorio.';
             } else {
-                errors.web_p = validarURL(webPValue);
+                errors.sitio_web = validarURL(webPValue);
             }
             
             // Validar correo
@@ -149,29 +150,19 @@ function validarFormulario(formId) {
             break;
     
             
-case 'form-autor':
-    // Validar nombre
-    errors.nombre = validarNombre(
-        document.getElementById('nombre').value, 
-        'nombre'
-    );
+            case 'form-autor':
+                errors.nombre = validarNombre(
+                    document.getElementById('nombre').value, 
+                    'nombre'
+                );
 
-    // Validar género
-    errors.genero = validarSelect(
-        document.getElementById('genero').value,
-        'género'
-    );
-
-    // Validar correo
-    const correoValue = document.getElementById('correo').value;
-    if (!correoValue) {
-        errors.correo = 'El correo es obligatorio.';
-    } else {
-        errors.correo = validarEmail(correoValue);
-    }
-    break;
-
-    }
+                const correoValue = document.getElementById('correo').value;
+                if (!correoValue) {
+                    errors.correo = 'El correo es obligatorio.';
+                } else {
+                    errors.correo = validarEmail(correoValue);
+                }
+            }
     
     // Filtrar solo errores con mensaje
     const filteredErrors = {};
