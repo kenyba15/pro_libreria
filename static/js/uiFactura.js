@@ -179,8 +179,111 @@ function saveAsDraft() {
     // Aquí iría la lógica para guardar en base de datos/localStorage
 }
 
+// Validar que el cliente esté seleccionado o que los datos del nuevo cliente sean válidos
+function validarClienteSeleccionado(cliente, camposNuevoCliente) {
+    if (!cliente && !camposNuevoCliente) {
+        return "Debe seleccionar un cliente o ingresar los datos de un nuevo cliente.";
+    }
+    return "";
+}
+
+function validarNuevoCliente(nombre, email) {
+    const errores = [];
+    if (!nombre || nombre.trim() === "") {
+        errores.push("El nombre del nuevo cliente es obligatorio.");
+    } else if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(nombre)) {
+        errores.push("El nombre del cliente solo puede contener letras y espacios.");
+    }
+    if (email && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+        errores.push("El correo electrónico del cliente no es válido.");
+    }
+    return errores;
+}
+
+// Validar dirección de envío
+function validarDireccion(direccion) {
+    if (!direccion || direccion.trim() === "") {
+        return "La dirección es obligatoria.";
+    }
+    return "";
+}
+
+// Validar que haya al menos un artículo
+function validarArticulos(articulos) {
+    if (!articulos || articulos.length === 0) {
+        return "Debe agregar al menos un artículo a la factura.";
+    }
+    return "";
+}
+
+// Validar cada artículo (nombre, cantidad, precio)
+function validarArticulo(item) {
+    const errores = [];
+    if (!item.nombre || item.nombre.trim() === "") {
+        errores.push("El nombre del artículo es obligatorio.");
+    }
+    if (!item.cantidad || isNaN(item.cantidad) || Number(item.cantidad) <= 0) {
+        errores.push("La cantidad del artículo debe ser un número positivo.");
+    }
+    if (!item.precio || isNaN(item.precio) || Number(item.precio) <= 0) {
+        errores.push("El precio del artículo debe ser un número positivo.");
+    }
+    return errores;
+}
+
+// Validar método de pago
+function validarMetodoPago(metodo) {
+    if (!metodo) {
+        return "Debe seleccionar un método de pago.";
+    }
+    return "";
+}
+
 // Inicializar la factura
 document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('facturaForm');
+    form.addEventListener('submit', function(e) {
+        let hayErrores = false;
+
+        // Limpiar mensajes previos
+        document.querySelectorAll('.error-message').forEach(div => div.textContent = '');
+
+        // Validar cliente
+        const customer = document.getElementById('customer').value;
+        const newCustomerFields = document.getElementById('newCustomerFields');
+        if (newCustomerFields && !newCustomerFields.classList.contains('hidden')) {
+            // Validar nuevo cliente
+            const nombre = document.getElementById('newCustomerName').value;
+            if (!nombre || nombre.trim() === "") {
+                document.getElementById('error-newCustomerName').textContent = "El nombre del nuevo cliente es obligatorio.";
+                hayErrores = true;
+            }
+        } else {
+            if (!customer) {
+                document.getElementById('error-customer').textContent = "Debe seleccionar un cliente.";
+                hayErrores = true;
+            }
+        }
+
+        // Validar dirección
+        const direccion = document.getElementById('shippingAddress').value;
+        if (!direccion || direccion.trim() === "") {
+            document.getElementById('error-shippingAddress').textContent = "La dirección es obligatoria.";
+            hayErrores = true;
+        }
+
+        // Validar método de pago
+        const metodoPago = document.querySelector('input[name="paymentMethod"]:checked');
+        if (!metodoPago) {
+            document.getElementById('error-paymentMethod').textContent = "Debe seleccionar un método de pago.";
+            hayErrores = true;
+        }
+
+        if (hayErrores) {
+            e.preventDefault();
+        }
+    });
+    
     // Agregar un ítem inicial
     document.getElementById('addItemBtn').click();
     

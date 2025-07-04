@@ -33,6 +33,25 @@
             </div>
         </form>
     </div>
+<h2>Formulario Autor</h2>
+<div class="card">
+    <div class="id-display">ID: <span id="id_autor">ID001</span></div>
+    <form id="form-autor" class="formulario validated-form" autocomplete="off">
+        <div class="form-group" autocomplete="off">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" autocomplete="off">
+            <div class="error-msg" id="error-nombre"></div>
+        </div>
+        <div class="form-group" autocomplete="off">
+            <label for="contacto">Correo:</label>
+            <input type="text" id="correo" name="correo" autocomplete="off" placeholder="ejemplo@autor.com">
+            <div class="error-msg" id="error-correo"></div>
+        </div>
+        <div class="button-group">
+            <button type="submit" class="btn-primary">Guardar</button>
+            <button type="reset" class="btn-secondary">Limpiar</button>
+        </div>
+    </form>
 </div>
 
 <div id="tabla-autores" style="margin-top:20px;">
