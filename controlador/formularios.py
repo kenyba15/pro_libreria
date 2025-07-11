@@ -1,7 +1,11 @@
+from flask import jsonify
 from flask import Blueprint, render_template, request, redirect, url_for
 from modelo.autorDAO import obtener_autores, insertar_autor, actualizar_autor, eliminar_autor, obtener_autor_por_id
 from modelo.editorialDAO import obtener_editoriales, insertar_editorial, actualizar_editorial, eliminar_editorial, obtener_editorial_por_id
-from modelo.libroDAO import obtener_libros, insertar_libro, actualizar_libro, eliminar_libro, obtener_libro_por_id, insertar_autores_libro, actualizar_autores_libro
+from modelo.libroDAO import obtener_libros, insertar_libro, actualizar_libro, eliminar_libro, obtener_libro_por_id, insertar_autores_libro, actualizar_autores_libro, obtener_libros_factura
+from modelo.facturaDAO import insertar_cliente, insertar_factura, insertar_detalles_factura
+from modelo.clienteDAO import insertar_cliente, obtener_clientes, actualizar_cliente, eliminar_cliente, buscar_cliente_por_cedula, obtener_cliente_por_id
+
 
 form_bp = Blueprint('form_bp', __name__)
 
@@ -108,3 +112,116 @@ def ui_factura():
 @form_bp.route('/Detalle_Factura')
 def detalle_f():
     return render_template('Detalle_Factura.html')
+
+@form_bp.route('/api/factura', methods=['POST'])
+def api_factura():
+    data = request.get_json()
+
+    try:
+        cliente_data = data['cliente']
+        factura_data = data['factura']
+        detalles = data['detalles']
+
+        # 1. Insertar cliente
+        id_cliente = insertar_cliente(
+            cliente_data['nombre'],
+            cliente_data['email'],
+            cliente_data['telefono'],
+            cliente_data['direccion'],
+            cliente_data['cedula']
+        )
+
+        # 2. Insertar factura
+        id_factura = insertar_factura(
+            id_cliente,
+            factura_data['fecha'],
+            factura_data['descuento'],
+            factura_data['impuesto'],
+            factura_data['metodo_pago'],
+            factura_data['notas']
+        )
+
+        # 3. Insertar detalles de la factura
+        insertar_detalles_factura(id_factura, detalles)
+
+        return jsonify({
+            'mensaje': 'Factura creada exitosamente',
+            'id_factura': id_factura
+        }), 201
+
+    except Exception as e:
+        print("Error:", e)
+        return jsonify({'error': 'Error al crear la factura'}), 500
+    
+    # Obtener todos los clientes
+@form_bp.route('/api/clientes', methods=['GET'])
+def api_get_clientes():
+    clientes = obtener_clientes()
+    return jsonify(clientes), 200
+
+# Insertar nuevo cliente
+@form_bp.route('/api/clientes', methods=['POST'])
+def api_post_cliente():
+    data = request.get_json()
+    try:
+        nombre = data['nombre']
+        email = data['email']
+        telefono = data['telefono']
+        direccion = data['direccion']
+        cedula = data['cedula']
+        
+        id_cliente = insertar_cliente(nombre, email, telefono, direccion, cedula)
+        return jsonify({'mensaje': 'Cliente insertado', 'id_cliente': id_cliente}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+# Buscar cliente por cédula
+@form_bp.route('/api/clientes/cedula/<cedula>', methods=['GET'])
+def api_get_cliente_por_cedula(cedula):
+    cliente = buscar_cliente_por_cedula(cedula)
+    if cliente:
+        return jsonify(cliente), 200
+    return jsonify({'error': 'Cliente no encontrado'}), 404
+
+# Obtener cliente por ID
+@form_bp.route('/api/clientes/<int:id_cliente>', methods=['GET'])
+def api_get_cliente_por_id(id_cliente):
+    cliente = obtener_cliente_por_id(id_cliente)
+    if cliente:
+        return jsonify(cliente), 200
+    return jsonify({'error': 'Cliente no encontrado'}), 404
+
+# Actualizar cliente
+@form_bp.route('/api/clientes/<int:id_cliente>', methods=['PUT'])
+def api_put_cliente(id_cliente):
+    data = request.get_json()
+    try:
+        actualizar_cliente(
+            id_cliente,
+            data['nombre'],
+            data['email'],
+            data['telefono'],
+            data['direccion'],
+            data['cedula']
+        )
+        return jsonify({'mensaje': 'Cliente actualizado'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+# Eliminar cliente (borrado lógico)
+@form_bp.route('/api/clientes/<int:id_cliente>', methods=['DELETE'])
+def api_delete_cliente(id_cliente):
+    try:
+        eliminar_cliente(id_cliente)
+        return jsonify({'mensaje': 'Cliente eliminado'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+    
+@form_bp.route('/api/libros', methods=['GET'])
+def api_get_libros():
+    try:
+        libros = obtener_libros_factura()  # Llama a la función que ya tienes en libroDAO
+        return jsonify(libros), 200
+    except Exception as e:
+        print("Error:", e)
+        return jsonify({'error': 'Error al obtener la lista de libros'}), 500

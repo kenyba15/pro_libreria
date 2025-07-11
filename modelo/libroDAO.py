@@ -54,6 +54,30 @@ def obtener_libros(busqueda=''):
     conn.close()
     return rows
 
+def obtener_libros_factura():
+    conn = obtener_conexion()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT 
+            l.id_libro, l.titulo, l.isbn, l.id_Editorial, l.idioma, l.genero, l.edicion, l.formato, l.best_seller,l.precio,
+            e.nombre AS nombre_editorial,
+            GROUP_CONCAT(a.nombre SEPARATOR ', ') AS autores,
+            GROUP_CONCAT(a.id_autor SEPARATOR ',') AS autores_ids
+        FROM libro l
+        LEFT JOIN editorial e ON l.id_Editorial = e.id_editorial
+        LEFT JOIN libro_autor la ON l.id_libro = la.id_libro
+        LEFT JOIN autor a ON la.id_autor = a.id_autor
+        WHERE l.estado = 1
+        GROUP BY l.id_libro
+    """)
+    rows = cursor.fetchall()
+    libros = []
+    for row in rows:
+        libros.append(row)
+    cursor.close()
+    conn.close()
+    return libros
+
 def insertar_libro(titulo, isbn, editorial, idioma, genero, edicion, formato, precio, best_seller):
     conn = obtener_conexion()
     cursor = conn.cursor()
