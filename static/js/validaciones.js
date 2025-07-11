@@ -91,3 +91,23 @@ function validarEmail(email) {
     }
     return '';
 }
+
+function validarPrecio(precio) {
+    if (!precio || precio.trim() === '') {
+        return 'El precio es obligatorio';
+    }
+
+    // Validar que sea número con hasta 2 decimales
+    const regex = /^\d+(\.\d{1,2})?$/;
+
+    if (!regex.test(precio)) {
+        return 'El precio debe ser un número válido';
+    }
+
+    const valor = parseFloat(precio);
+    if (valor <= 0) {
+        return 'El precio debe ser mayor a 0';
+    }
+
+    return '';
+}

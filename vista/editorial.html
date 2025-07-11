@@ -6,6 +6,12 @@
 {% block contenido %}
 <h1>Editoriales</h1>
 
+<form id="form-busqueda" method="GET" action="{{ url_for('form_bp.editorial') }}">
+  <input type="text" name="busqueda" id="busqueda-editorial" placeholder="Buscar editorial..."
+         style="margin-bottom: 10px; width: 50%; padding: 5px;"
+         value="{{ request.args.get('busqueda', '') }}" autocomplete="off">
+</form>
+
 <button id="btn-crear-editorial" class="btn-primary">Crear Editorial</button>
 
 <div id="form-container-editorial" style="display:none; margin-top:20px;">

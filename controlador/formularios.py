@@ -22,7 +22,8 @@ def autor():
             insertar_autor(nombre, correo)
         return redirect(url_for('form_bp.autor'))
 
-    autores = obtener_autores()
+    busqueda = request.args.get('busqueda', '')
+    autores = obtener_autores(busqueda)
     return render_template('autor.html', autores=autores)
 
 @form_bp.route('/autor/editar/<int:id_autor>')
@@ -43,28 +44,28 @@ def libro():
         titulo = request.form.get('titulo')
         isbn = request.form.get('isbn')
         editorial = request.form.get('editorial')
-        autores = request.form.getlist('autor')  # Aquí recibes lista (multiple)
+        autores = request.form.getlist('autor')
         idioma = request.form.get('idioma')
         genero = request.form.get('genero')
         edicion = request.form.get('edicion')
         formato = request.form.get('formato')
+        precio = request.form.get('precio')
         best_seller = 1 if request.form['bestSeller'] == 'true' else 0
 
-
-        if id_libro:  # Editar
-            actualizar_libro(id_libro, titulo, isbn, editorial, idioma, genero, edicion, formato, best_seller)
+        if id_libro:
+            actualizar_libro(id_libro, titulo, isbn, editorial, idioma, genero, edicion, formato, precio, best_seller)
             actualizar_autores_libro(id_libro, autores)
-        else:  # Nuevo
-            nuevo_id = insertar_libro(titulo, isbn, editorial, idioma, genero, edicion, formato, best_seller)
+        else:
+            nuevo_id = insertar_libro(titulo, isbn, editorial, idioma, genero, edicion, formato, precio, best_seller)
             insertar_autores_libro(nuevo_id, autores)
 
         return redirect(url_for('form_bp.libro'))
 
-    libros = obtener_libros()
+    busqueda = request.args.get('busqueda', '')  # texto a filtrar
+    libros = obtener_libros(busqueda)
     editoriales = obtener_editoriales()
     autores = obtener_autores()
     return render_template('libro.html', libros=libros, editoriales=editoriales, autores=autores)
-
 
 @form_bp.route('/libro/eliminar/<int:id_libro>')
 def eliminar_libro_ruta(id_libro):
@@ -85,7 +86,8 @@ def editorial():
             insertar_editorial(nombre, tipo, sitio_web, correo)
         return redirect(url_for('form_bp.editorial'))
 
-    editoriales = obtener_editoriales()
+    busqueda = request.args.get('busqueda', '')
+    editoriales = obtener_editoriales(busqueda)
     return render_template('editorial.html', editoriales=editoriales)
 
 @form_bp.route('/editorial/editar/<int:id_editorial>')

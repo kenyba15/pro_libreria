@@ -1,9 +1,16 @@
 from modelo.conexion import obtener_conexion
 
-def obtener_editoriales():
+def obtener_editoriales(busqueda=''):
     conexion = obtener_conexion()
     cursor = conexion.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM editorial WHERE estado = 1")
+    sql = "SELECT * FROM editorial WHERE estado = 1"
+    params = ()
+
+    if busqueda:
+        sql += " AND nombre LIKE %s"
+        params = (f"%{busqueda}%",)
+
+    cursor.execute(sql, params)
     editoriales = cursor.fetchall()
     conexion.close()
     return editoriales

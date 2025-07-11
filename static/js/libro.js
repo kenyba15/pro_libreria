@@ -29,8 +29,9 @@ $('.editar-libro').click(function(e) {
     const genero = $(this).data('genero');
     const edicion = $(this).data('edicion');
     const formato = $(this).data('formato');
+    const precio = $(this).data('precio');  
     const bestSeller = $(this).data('best_seller');
-
+    
     $('#input_id_libro').val(id);
     $('#titulo').val(titulo);
     $('#isbn').val(isbn);
@@ -39,6 +40,7 @@ $('.editar-libro').click(function(e) {
     $('#genero').val(genero);
     $('#edicion').val(edicion);
     $('input[name="formato"][value="' + formato + '"]').prop('checked', true);
+    $('#precio').val(precio);
     $('input[name="bestSeller"][value="' + bestSeller + '"]').prop('checked', true);
 
     // Limpiar y seleccionar autores
@@ -50,6 +52,7 @@ $('.editar-libro').click(function(e) {
     $('#form-container-libro').show();
     $('#tabla-libros').hide();
 });
+
 
 
   function clearErrors() {
@@ -138,3 +141,11 @@ $(document).ready(function() {
         $('#tabla-libros').hide();
     });
 });
+
+document.getElementById('busqueda-libro').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    document.getElementById('form-busqueda').submit();
+  }
+});
+
