@@ -12,6 +12,6 @@ def abrir_navegador():
     if not os.environ.get("WERKZEUG_RUN_MAIN"):  # Evita que se ejecute dos veces en modo debug
         webbrowser.open_new("http://localhost:5000/")
 
-if __name__ == '__main__':
+if __name__ == '__main__':  
     threading.Timer(1.0, abrir_navegador).start()
     app.run(debug=True)
