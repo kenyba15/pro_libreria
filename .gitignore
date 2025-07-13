@@ -1,3 +1,26 @@
-venv/
+# Python cache
 __pycache__/
-*.pyc
+*.py[cod]
+.pytest_cache/
+
+# Entornos virtuales
+venv/
+env/
+.venv/
+
+# Archivos de entorno
+.env
+.venv
+
+# Configuraciones de IDE
+.vscode/
+.idea/
+
+# Flask-specific
+instance/
+.webassets-cache
+flask_session/
+
+# Archivos de desarrollo
+*.log
+*.pot

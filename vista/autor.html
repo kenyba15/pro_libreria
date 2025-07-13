@@ -2,54 +2,72 @@
 
 {% block title %}Autor{% endblock %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/biblioteca.css') }}">
+
 {% block contenido %}
-<h2>Formulario Autor</h2>
-<div class="card">
-    <div class="id-display">ID: <span id="id_autor">ID001</span></div>
-    <form id="form-autor" class="formulario validated-form" autocomplete="off">
-        <div class="form-group" autocomplete="off">
-            <label for="nombre">Nombre:</label>
-            <input type="text" id="nombre" name="nombre" autocomplete="off">
-            <div class="error-msg" id="error-nombre"></div>
-        </div>
-        <div class="form-group" autocomplete="off">
-            <label for="contacto">Correo:</label>
-            <input type="text" id="correo" name="correo" autocomplete="off" placeholder="ejemplo@autor.com">
-            <div class="error-msg" id="error-correo"></div>
-        </div>
-        <div class="form-row">
+
+<h2>Autores</h2>
+
+<form id="form-busqueda" method="GET" action="{{ url_for('form_bp.autor') }}">
+  <input type="text" name="busqueda" id="busqueda-autor" placeholder="Buscar autor..." 
+         style="margin-bottom: 10px; width: 50%; padding: 5px;" 
+         value="{{ request.args.get('busqueda', '') }}" autocomplete="off">
+</form>
+
+<button id="btn-crear-autor" class="btn-primary">Crear Autor</button>
+
+<div id="form-container" style="display:none; margin-top:20px;">
+    <div class="card">
+        <form id="form-autor" class="formulario validated-form" action="{{ url_for('form_bp.autor') }}" method="POST" autocomplete="off">
+            <input type="hidden" name="id_autor" id="input_id_autor" value="{{ autor.id_autor if autor else '' }}">
+
+            
             <div class="form-group" autocomplete="off">
-                <label for="genero">Género:</label>
-                <select id="genero" name="genero">
-                    <option value="">Seleccione género...</option>
-                    <option value="novela">Novela</option>
-                    <option value="ciencia-ficcion">Ciencia Ficción</option>
-                    <option value="fantasia">Fantasía</option>
-                    <option value="historia">Historia</option>
-                    <option value="tecnico">Técnico</option>
-                </select>
-                <div class="error-msg" id="error-genero"></div>
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" value="{{ autor.nombre if autor else '' }}" autocomplete="off">
+                <div class="error-msg" id="error-nombre"></div>
             </div>
-        <div class="button-group">
-            <button type="submit" class="btn-primary">Guardar</button>
-            <button type="reset" class="btn-secondary">Limpiar</button>
-        </div>
-    </form>
+            
+            <div class="form-group" autocomplete="off">
+                <label for="correo">Correo:</label>
+                <input type="text" id="correo" name="correo" value="{{ autor.correo if autor else '' }}" autocomplete="off" placeholder="ejemplo@autor.com">
+                <div class="error-msg" id="error-correo"></div>
+            </div>
+            
+            <div class="button-group">
+                <button type="submit" class="btn-primary">Guardar</button>
+                <button type="button" id="btn-cancelar" class="btn-secondary">Cancelar</button>
+            </div>
+        </form>
+    </div>
 </div>
-<!-- Incluir los mismos scripts de validación que para libro -->
+
+<div id="tabla-autores" style="margin-top:20px;">
+    <table border="1" style="width:100%; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th>ID</th><th>Nombre</th><th>Correo</th><th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in autores %}
+            <tr>
+                <td>{{ a.id_autor }}</td>
+                <td>{{ a.nombre }}</td>
+                <td>{{ a.correo }}</td>
+                <td>
+                    <a href="#" class="editar-autor" data-id="{{ a.id_autor }}" data-nombre="{{ a.nombre }}" data-correo="{{ a.correo }}">Editar</a>
+                    |
+                    <a href="{{ url_for('form_bp.eliminar_autor_ruta', id_autor=a.id_autor) }}" onclick="return confirm('¿Eliminar autor?')">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
 <script src="{{ url_for('static', filename='js/maneFor.js') }}"></script>
+<script src="{{ url_for('static', filename='js/autor.js') }}"></script>
 
-<script>
-// Inicialización para Select2 si decides usarlo en el futuro
-$(document).ready(function() {
-    // Si quieres hacer el campo de tipo más bonito con Select2
-    // $('#tipo').select2({
-    //     placeholder: "Seleccione tipo de editorial",
-    //     allowClear: false
-    // });
-});
-</script>
 {% endblock %}
-

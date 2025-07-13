@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Reportes{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/reportes.css') }}">
+{% endblock %}
+
+{% block contenido %}
+
+<h1>Reportes</h1>
+
+<!-- Formulario para seleccionar tipo y mostrar tabla -->
+<form method="get" action="{{ url_for('form_bp.reportes') }}">
+    <label for="tipo">Seleccione el tipo de reporte:</label>
+    <select name="tipo" id="tipo" onchange="this.form.submit()">
+        <option value="">-- Seleccionar --</option>
+        <option value="baja_rotacion" {% if tipo_reporte == 'baja_rotacion' %}selected{% endif %}>Libros Baja Rotación</option>
+        <option value="best_seller" {% if tipo_reporte == 'best_seller' %}selected{% endif %}>Libros Best Seller</option>
+    </select>
+</form>
+
+<!-- Mostrar tabla según tipo -->
+{% if tipo_reporte == 'baja_rotacion' %}
+    <h2>Libros de Baja Rotación</h2>
+    <table class="tabla-reportes">
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>ISBN</th>
+                <th>Idioma</th>
+                <th>Género</th>
+                <th>Edición</th>
+                <th>Formato</th>
+                <th>Precio</th>
+                <th>Total Vendido</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for libro in libros_baja_rotacion %}
+            <tr>
+                <td>{{ libro.titulo }}</td>
+                <td>{{ libro.isbn }}</td>
+                <td>{{ libro.idioma }}</td>
+                <td>{{ libro.genero }}</td>
+                <td>{{ libro.edicion }}</td>
+                <td>{{ libro.formato }}</td>
+                <td>{{ libro.precio }}</td>
+                <td>{{ libro.total_vendido }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="8">No hay libros de baja rotación.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% elif tipo_reporte == 'best_seller' %}
+    <h2>Libros Best Seller</h2>
+    <table class="tabla-reportes">
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>ISBN</th>
+                <th>Idioma</th>
+                <th>Género</th>
+                <th>Edición</th>
+                <th>Formato</th>
+                <th>Precio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for libro in libros_best_seller %}
+            <tr>
+                <td>{{ libro.titulo }}</td>
+                <td>{{ libro.isbn }}</td>
+                <td>{{ libro.idioma }}</td>
+                <td>{{ libro.genero }}</td>
+                <td>{{ libro.edicion }}</td>
+                <td>{{ libro.formato }}</td>
+                <td>{{ libro.precio }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7">No hay libros best seller.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+<!-- Botón para generar PDF solo si hay tipo seleccionado -->
+{% if tipo_reporte %}
+<form id="pdfForm" method="get" action="{{ url_for('form_bp.generar_pdf') }}">
+    <input type="hidden" name="tipo" value="{{ tipo_reporte }}">
+    <button type="submit">Generar PDF</button>
+</form>
+{% endif %}
+
+<p id="errorMsg" style="color:red; display:none;"></p>
+
+<script src="{{ url_for('static', filename='js/reportes.js') }}"></script>
+
+{% endblock %}

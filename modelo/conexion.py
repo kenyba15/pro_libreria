@@ -1,4 +1,4 @@
-import mysql.connector  
+import mysql.connector
 
 def obtener_conexion():
     return mysql.connector.connect(

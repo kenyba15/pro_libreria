@@ -1,64 +1,102 @@
 {% extends 'base.html' %}
 
 {% block title %}Editorial{% endblock %}
-{% block contenido %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/biblioteca.css') }}">
-<h2>Formulario Editorial</h2>
-<div class="card">
-    <div class="id-display">ID: <span id="id_editorial">ID003</span></div>
-    <!-- Agregar ID y clase para validación -->
-    <form id="form-editorial" class="formulario validated-form" autocomplete="off">
-        <div class="form-row">
-            <div class="form-group" autocomplete="off">
-                <label for="nombre">Nombre:</label>
-                <input type="text" id="nombre" name="nombre" autocomplete="off">
-                <div class="error-msg" id="error-nombre"></div>
-            </div>
-            <div class="form-group" autocomplete="off">
-                <label for="tipo">Tipo:</label>
-                <select id="tipo" name="tipo">
-                    <option value="">Seleccione tipo de editorial...</option>
-                    <option value="tradicional">Tradicional</option>
-                    <option value="independiente">Independiente</option>
-                    <option value="universitaria">Universitaria</option>
-                    <option value="estatal">Estatal</option>
-                    <option value="coedicion">Coedición</option>
-                </select>
-                <div class="error-msg" id="error-tipo"></div>
-            </div>
+
+{% block contenido %}
+<h1>Editoriales</h1>
+
+<form id="form-busqueda" method="GET" action="{{ url_for('form_bp.editorial') }}">
+  <input type="text" name="busqueda" id="busqueda-editorial" placeholder="Buscar editorial..."
+         style="margin-bottom: 10px; width: 50%; padding: 5px;"
+         value="{{ request.args.get('busqueda', '') }}" autocomplete="off">
+</form>
+
+<button id="btn-crear-editorial" class="btn-primary">Crear Editorial</button>
+
+<div id="form-container-editorial" style="display:none; margin-top:20px;">
+    <div class="card">
+        <div class="id-display" style="display: none;">
+            <span id="id_editorial">{{ editorial.id_editorial if editorial else '' }}</span>
         </div>
-        <div class="form-row">
-            <div class="form-group" autocomplete="off">
-                <label for="web_p">Sitio web:</label>
-                <input type="text" id="web_p" name="web_p" autocomplete="off" placeholder="https://ejemplo.com">
-                <div class="error-msg" id="error-web_p"></div>
+        <form id="form-editorial" class="formulario validated-form" action="{{ url_for('form_bp.editorial') }}" method="POST" autocomplete="off">
+            <input type="hidden" name="id_editorial" id="input_id_editorial" value="{{ editorial.id_editorial if editorial else '' }}">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre" name="nombre" value="{{ editorial.nombre if editorial else '' }}">
+                    <div class="error-msg" id="error-nombre"></div>
+                </div>
+                <div class="form-group">
+                    <label for="tipo">Tipo:</label>
+                    <select id="tipo" name="tipo">
+                        <option value="">Seleccione tipo...</option>
+                        <option value="tradicional" {% if editorial and editorial.tipo == 'tradicional' %}selected{% endif %}>Tradicional</option>
+                        <option value="independiente" {% if editorial and editorial.tipo == 'independiente' %}selected{% endif %}>Independiente</option>
+                        <option value="universitaria" {% if editorial and editorial.tipo == 'universitaria' %}selected{% endif %}>Universitaria</option>
+                        <option value="estatal" {% if editorial and editorial.tipo == 'estatal' %}selected{% endif %}>Estatal</option>
+                        <option value="coedicion" {% if editorial and editorial.tipo == 'coedicion' %}selected{% endif %}>Coedición</option>
+                    </select>
+                    <div class="error-msg" id="error-tipo"></div>
+                </div>
             </div>
-            <div class="form-group" autocomplete="off">
-                <label for="correo">Correo:</label>
-                <input type="text" id="correo" name="correo" autocomplete="off" placeholder="ejemplo@editorial.com">
-                <div class="error-msg" id="error-correo"></div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="sitio_web">Sitio web:</label>
+                    <input type="text" id="sitio_web" name="sitio_web" value="{{ editorial.sitio_web if editorial else '' }}">
+                    <div class="error-msg" id="error-sitio_web"></div>
+                </div>
+                <div class="form-group">
+                    <label for="correo">Correo:</label>
+                    <input type="text" id="correo" name="correo" value="{{ editorial.correo if editorial else '' }}">
+                    <div class="error-msg" id="error-correo"></div>
+                </div>
             </div>
-        </div>
-        <div class="button-group">
-            <button type="submit" class="btn-primary">Guardar</button>
-            <button type="reset" class="btn-secondary">Limpiar</button>
-        </div>
-    </form>
+
+            <div class="button-group">
+                <button type="submit" class="btn-primary">Guardar</button>
+                <button type="button" id="btn-cancelar-editorial" class="btn-secondary">Cancelar</button>
+            </div>
+        </form>
+    </div>
 </div>
 
-<!-- Incluir los mismos scripts de validación que para libro -->
+<div id="tabla-editoriales" style="margin-top:20px;">
+    <table border="1" style="width:100%; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th>ID</th><th>Nombre</th><th>Tipo</th><th>Sitio web</th><th>Correo</th><th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in editoriales %}
+            <tr>
+                <td>{{ e.id_editorial }}</td>
+                <td>{{ e.nombre }}</td>
+                <td>{{ e.tipo }}</td>
+                <td>{{ e.sitio_web }}</td>
+                <td>{{ e.correo }}</td>
+                <td>
+                    <a href="#" class="editar-editorial"
+                    data-id="{{ e.id_editorial }}"
+                    data-nombre="{{ e.nombre }}"
+                    data-tipo="{{ e.tipo }}"
+                    data-sitio_web="{{ e.sitio_web }}"
+                    data-correo="{{ e.correo }}">Editar</a>
+
+                    |
+                    <a href="{{ url_for('form_bp.eliminar_editorial_ruta', id_editorial=e.id_editorial) }}" onclick="return confirm('¿Eliminar editorial?')">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
 <script src="{{ url_for('static', filename='js/maneFor.js') }}"></script>
-
-<script>
-// Inicialización para Select2 si decides usarlo en el futuro
-$(document).ready(function() {
-    // Si quieres hacer el campo de tipo más bonito con Select2
-    // $('#tipo').select2({
-    //     placeholder: "Seleccione tipo de editorial",
-    //     allowClear: false
-    // });
-});
-</script>
+<script src="{{ url_for('static', filename='js/editorial.js') }}"></script>
 {% endblock %}

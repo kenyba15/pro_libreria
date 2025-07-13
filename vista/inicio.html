@@ -12,19 +12,19 @@
         <div class="stats-container">
             <div class="stat-card">
                 <div class="stat-icon">📚</div>
-                <div class="stat-value">150</div>
+                <div class="stat-value">{{ total_libros }}</div>
                 <div class="stat-label">Libros registrados</div>
             </div>
             
             <div class="stat-card">
                 <div class="stat-icon">✍️</div>
-                <div class="stat-value">45</div>
+                <div class="stat-value">{{ total_autores }}</div>
                 <div class="stat-label">Autores</div>
             </div>
             
             <div class="stat-card">
                 <div class="stat-icon">🏢</div>
-                <div class="stat-value">12</div>
+                <div class="stat-value">{{ total_editoriales }}</div>
                 <div class="stat-label">Editoriales</div>
             </div>
         </div>
@@ -43,21 +43,18 @@
     <div class="recent-activity">
         <h2>Actividad Reciente</h2>
         <div class="activity-list">
+            {% for act in ultimas_actividades %}
             <div class="activity-item">
-                <div class="activity-icon">📖</div>
-                <div class="activity-text">Se agregó "Cien años de soledad" al catálogo</div>
-                <div class="activity-time">Hace 2 horas</div>
+                <div class="activity-icon">
+                    {% if act.tipo == 'libro' %}📖
+                    {% elif act.tipo == 'autor' %}✍️
+                    {% elif act.tipo == 'editorial' %}🏢
+                    {% else %}🔔{% endif %}
+                </div>
+                <div class="activity-text">{{ act.descripcion }}</div>
+                <div class="activity-time">{{ act.fecha.strftime('%d/%m/%Y %H:%M') }}</div>
             </div>
-            <div class="activity-item">
-                <div class="activity-icon">✍️</div>
-                <div class="activity-text">Nuevo autor registrado: Gabriel García Márquez</div>
-                <div class="activity-time">Ayer</div>
-            </div>
-            <div class="activity-item">
-                <div class="activity-icon">🏢</div>
-                <div class="activity-text">Editorial "Penguin Random House" actualizada</div>
-                <div class="activity-time">3 días atrás</div>
-            </div>
+            {% endfor %}
         </div>
     </div>
 </div>

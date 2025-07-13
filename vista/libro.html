@@ -1,118 +1,199 @@
 {% extends 'base.html' %}
 
-{% block title %}Libro{% endblock %}
-{% block contenido %}
+{% block title %}Libros{% endblock %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/biblioteca.css') }}">
-<h2>Formulario Libro</h2>
-<div class="card">
-    <div class="id-display">ID: <span id="id_libro">ID002</span></div>
-    <!-- Añadido id y clase para validación -->
-    <form id="form-libro" class="formulario validated-form" autocomplete="off">
-        <div class="form-row">
+
+{% block contenido %}
+<h2>Libros</h2>
+
+<form id="form-busqueda" method="GET" action="{{ url_for('form_bp.libro') }}">
+  <input type="text" name="busqueda" id="busqueda-libro" placeholder="Buscar por título..." 
+         style="margin-bottom: 10px; width: 50%; padding: 5px;" 
+         value="{{ request.args.get('busqueda', '') }}" autocomplete="off">
+</form>
+
+
+<button id="btn-crear-libro" class="btn-primary">Crear Libro</button>
+
+<div id="form-container-libro" style="display:none; margin-top:20px;">
+    <div class="card">
+        <form id="form-libro" class="formulario validated-form" action="{{ url_for('form_bp.libro') }}" method="POST" autocomplete="off">
+            <input type="hidden" name="id_libro" id="input_id_libro">
+
             <div class="form-group">
                 <label for="titulo">Título:</label>
                 <input type="text" id="titulo" name="titulo">
                 <div class="error-msg" id="error-titulo"></div>
             </div>
+
             <div class="form-group">
                 <label for="isbn">ISBN:</label>
-                <input type="text" id="isbn" name="isbn">
-                <div class="error-msg" id="error-isbn"></div>
+                <input type="text" id="isbn" name="isbn" value="{{ libro.isbn if libro else '' }}">
+            <div class="error-msg" id="error-isbn"></div>
             </div>
-        </div>
 
-        <div class="form-row">
-            <div class="form-group" autocomplete="off">
+            <div class="form-group">
                 <label for="editorial">Editorial:</label>
-                <select name="editorial" id="editorial" class="select-search">
+                <select id="editorial" name="editorial">
                     <option value="">Seleccione editorial...</option>
-                    <option value="1">Planeta</option>
-                    <option value="2">Alfaguara</option>
-                    <option value="3">Penguin Random House</option>
-                    <option value="4">Anagrama</option>
+                    {% for e in editoriales %}
+                    <option value="{{ e.id_editorial }}">{{ e.nombre }}</option>
+                    {% endfor %}
                 </select>
                 <div class="error-msg" id="error-editorial"></div>
             </div>
 
-            <div class="form-group" autocomplete="off">
-                <label for="autor">Autor:</label>
-                <select name="autor" id="autor" class="select-search">
-                    <option value="">Seleccione autor...</option>
-                    <option value="1">Gabriel García Márquez</option>
-                    <option value="2">Isabel Allende</option>
-                    <option value="3">Mario Vargas Llosa</option>
-                    <option value="4">Jorge Luis Borges</option>
+            <div class="form-group">
+                <label for="autor">Autores:</label>
+                <select id="autor" name="autor" multiple>
+                    {% for a in autores %}
+                    <option value="{{ a.id_autor }}">{{ a.nombre }}</option>
+                    {% endfor %}
                 </select>
                 <div class="error-msg" id="error-autor"></div>
             </div>
 
-            <div class="form-group" autocomplete="off">
+            <div class="form-group">
                 <label for="idioma">Idioma:</label>
                 <select id="idioma" name="idioma">
                     <option value="">Seleccione idioma...</option>
-                    <option value="es">Español</option>
-                    <option value="en">Inglés</option>
-                    <option value="fr">Francés</option>
-                    <option value="de">Alemán</option>
+                    <option value="Español">Español</option>
+                    <option value="Ingles">Inglés</option>
+                    <option value="Frances">Francés</option>
+                    <option value="Aleman">Alemán</option>
                 </select>
                 <div class="error-msg" id="error-idioma"></div>
             </div>
-        </div>
 
-        <div class="form-row">
             <div class="form-group">
                 <label for="genero">Género:</label>
-                <select name="genero" id="genero" class="select-search">
+                <select id="genero" name="genero">
                     <option value="">Seleccione género...</option>
                     <option value="novela">Novela</option>
-                    <option value="ciencia-ficcion">Ciencia Ficción</option>
-                    <option value="fantasia">Fantasía</option>
-                    <option value="historia">Historia</option>
-                    <option value="tecnico">Técnico</option>
+                    <option value="Fantasía">Fantasía</option>
+                    <option value="Distopía">Distopía</option>
+                    <option value="Realismo mágico">Realismo mágico</option>
+                    <option value="Ficción">Ficción</option>
+                    <option value="Existencialismo">Existencialismo</option>
+                    <option value="Romántico">Romántico</option>
+                    <option value="Drama">Drama</option>
+                    <option value="Poesía">Poesía</option>
+                    <option value="Terror">Terror</option>
+                    <option value="Ensayo">Ensayo</option>
+                    <option value="Aventura">Aventura</option>
+                    <option value="Misterio">Misterio</option>
+                    <option value="Narrativa">Narrativa</option>
+                    <option value="Ciencia ficción">Ciencia ficción</option>
+                    <option value="Ficción histórica">Ficción histórica</option>
+                    <option value="Clásico">Clásico</option>
+                    <option value="Thriller">Thriller</option>
+                    <option value="Autobiografía">Autobiografía</option>
+                    <option value="Espiritualidad">Espiritualidad</option>
                 </select>
                 <div class="error-msg" id="error-genero"></div>
             </div>
-            <div class="form-group" autocomplete="off">
+
+            <div class="form-group">
                 <label for="edicion">Edición:</label>
                 <input type="number" id="edicion" name="edicion" min="1" value="1">
                 <div class="error-msg" id="error-edicion"></div>
             </div>
-        </div>
 
-        <div class="form-row">
-        <div class="form-group" autocomplete="off">
-            <label>Formato:</label>
-            <div class="radio-group">
-                <label><input type="radio" name="formato" value="tapa-dura" checked> Tapa dura</label>
-                <label><input type="radio" name="formato" value="tapa-blanda"> Tapa blanda</label>
-                <label><input type="radio" name="formato" value="digital"> Digital</label>
-                <label><input type="radio" name="formato" value="audiolibro"> Audiolibro</label>
+            <div class="form-group">
+                <label>Formato:</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="formato" value="Tapa dura"> Tapa dura</label>
+                    <label><input type="radio" name="formato" value="Tapa blanda"> Tapa blanda</label>
+                    <label><input type="radio" name="formato" value="Digital"> Digital</label>
+                    <label><input type="radio" name="formato" value="Audiolibro"> Audiolibro</label>
+                </div>
             </div>
-            <div class="error-msg" id="error-formato"></div>
-        </div>
-        <div class="form-group" autocomplete="off">
-            <label>¿Es Best Seller?</label>
-            <div class="radio-group">
-                <label><input type="radio" name="bestSeller" value="false" checked> No</label>
-                <label><input type="radio" name="bestSeller" value="true"> Sí</label>
-            </div>
-            <div class="error-msg" id="error-formato"></div>
-        </div>
-        </div>
 
-        <div class="button-group">
-            <button type="submit" class="btn-primary">Guardar</button>
-            <button type="reset" class="btn-secondary">Limpiar</button>
-        </div>
-    </form>
+            <div class="form-group">
+                <label for="precio">Precio:</label>
+                <input type="number" id="precio" name="precio" min="0" step="0.01">
+                <div class="error-msg" id="error-precio"></div>
+            </div>
+
+            <div class="form-group">
+                <label>¿Es Best Seller?</label>
+                <div class="radio-group">
+                    <label>
+                    <input type="radio" name="bestSeller" value="false" {% if libro and not libro.best_seller %}checked{% endif %}> No
+                    </label>
+                    <label>
+                    <input type="radio" name="bestSeller" value="true" {% if libro and libro.best_seller %}checked{% endif %}> Sí
+                    </label>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn-primary">Guardar</button>
+                <button type="button" id="btn-cancelar-libro" class="btn-secondary">Cancelar</button>
+            </div>
+        </form>
+    </div>
 </div>
-<!-- jQuery y Select2 desde CDN -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="{{ url_for('static', filename='js/select2-init.js') }}"></script>
 
-<!-- Archivos de validación -->
+<div id="tabla-libros" style="margin-top:20px;">
+    <table border="1" style="width:100%; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Título</th>
+                <th>ISBN</th>
+                <th>Editorial</th>
+                <th>Autores</th>
+                <th>Idioma</th>
+                <th>Género</th>
+                <th>Edición</th>
+                <th>Formato</th>
+                <th>Precio</th>
+                <th>Best Seller</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="tabla-libros-body">
+            {% for l in libros %}
+            <tr>
+                <td>{{ l.id_libro }}</td>
+                <td>{{ l.titulo }}</td>
+                <td>{{ l.isbn }}</td>
+                <td>{{ l.nombre_editorial }}</td>
+                <td>{{ l.autores }}</td>
+                <td>{{ l.idioma }}</td>
+                <td>{{ l.genero }}</td>
+                <td>{{ l.edicion }}</td>
+                <td>{{ l.formato }}</td>
+                <td>{{ l.precio }}</td>
+                <td>{{ 'Sí' if l.best_seller == 1 else 'No' }}</td>
+                <td>
+                    <a href="#" class="editar-libro"
+                       data-id="{{ l.id_libro }}"
+                       data-titulo="{{ l.titulo }}"
+                       data-isbn="{{ l.isbn }}"
+                       data-editorial="{{ l.id_Editorial }}"
+                       data-autores="{{ l.autores_ids }}"
+                       data-idioma="{{ l.idioma }}"
+                       data-genero="{{ l.genero }}"
+                       data-edicion="{{ l.edicion }}"
+                       data-formato="{{ l.formato }}"
+                       data-precio="{{ l.precio }}"
+                       data-best_seller="{{ l.best_seller }}">Editar</a>
+                    |
+                    <a href="{{ url_for('form_bp.eliminar_libro_ruta', id_libro=l.id_libro) }}" onclick="return confirm('¿Eliminar libro?')">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
 <script src="{{ url_for('static', filename='js/maneFor.js') }}"></script>
+<script src="{{ url_for('static', filename='js/libro.js') }}"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 {% endblock %}
