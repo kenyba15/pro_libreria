@@ -28,8 +28,8 @@
 
             <div class="form-group">
                 <label for="isbn">ISBN:</label>
-                <input type="text" id="isbn" name="isbn">
-                <div class="error-msg" id="error-isbn"></div>
+                <input type="text" id="isbn" name="isbn" value="{{ libro.isbn if libro else '' }}">
+            <div class="error-msg" id="error-isbn"></div>
             </div>
 
             <div class="form-group">

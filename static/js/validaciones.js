@@ -47,14 +47,17 @@ function validarNumeroPositivo(valor, campo) {
 // Validar ISBN (13 dígitos)
 function validarISBN(isbn) {
     if (!isbn || isbn.trim() === '') {
-        return ''; // Campo opcional
+        return 'El ISBN es obligatorio';
     }
-    
+
     if (!/^\d{13}$/.test(isbn)) {
         return 'ISBN inválido (debe tener exactamente 13 dígitos numéricos)';
     }
-    return '';
+
+    return ''; // Válido
 }
+
+
 
 // Validar opciones de radio
 function validarRadio(nombre) {

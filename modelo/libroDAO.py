@@ -145,3 +145,4 @@ def obtener_libro_por_id(id_libro):
     libro['autores'] = autores
     conexion.close()
     return libro
+

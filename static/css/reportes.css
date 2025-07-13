@@ -1,0 +1,27 @@
+/* static/css/reportes.css */
+.tabla-reportes {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+.tabla-reportes th, .tabla-reportes td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+.tabla-reportes th {
+    background-color: #3498db;
+    color: white;
+}
+.descargar-btn {
+    display: inline-block;
+    margin-top: 20px;
+    background-color: #3498db;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+.descargar-btn:hover {
+    background-color: #2980b9;
+}
