@@ -66,10 +66,12 @@
 .btn-secondary {
     background-color: #e5e7eb;
     color: #4b5563;
+    transition: background 0.2s, color 0.2s;
 }
 
 .btn-secondary:hover {
-    background-color: #d1d5db;
+    background-color: #ec7575; /* rojo suave */
+    color: #fdf9f9;            /* rojo oscuro para el texto */
 }
 
 .btn-primary {
@@ -100,9 +102,11 @@
 .factura-form {
     flex: 1;
     background: white;
-    border-radius: 12px;
+    border-radius: 18px;           /* Bordes más redondeados */
     padding: 2rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 2.5px solid #7c3aed;  /* Contorno color violeta/azul que combina */
+    transition: border-color 0.2s;
 }
 
 .form-section, .items-section, .totals-section {
@@ -158,14 +162,41 @@ textarea {
 /* Select con icono */
 .select-wrapper {
     position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.select-wrapper select {
+    width: 100%;
+    padding-right: 2.5em; /* Más espacio para el icono y la flecha */
+    box-sizing: border-box;
+    height: 2.4em;
+    font-size: 1em;
 }
 
 .select-wrapper i {
     position: absolute;
-    right: 1rem;
+    right: 2.2em; /* Separa el icono de la flecha del combobox */
+    pointer-events: none;
+    color: #888;
+    font-size: 1.1em;
     top: 50%;
     transform: translateY(-50%);
-    color: #9ca3af;
+}
+
+/* Estado de error para el select */
+.select-wrapper select.input-error {
+    border: 2px solid #d32f2f !important;
+    background-color: #fff0f0;
+    color: #d32f2f;
+}
+
+/* Evita que el texto se corte */
+.select-wrapper select {
+    line-height: 1.5em;
+    padding-top: 0.2em;
+    padding-bottom: 0.2em;
+    overflow: visible;
 }
 
 /* Items de factura */
@@ -175,6 +206,9 @@ textarea {
     border-radius: 8px;
     padding: 1rem;
     min-height: 100px;
+    max-height: 340px; /* Aproximadamente 3-4 productos, ajusta según tu diseño */
+    overflow-y: auto;
+    background: #f9fafb;
 }
 
 .invoice-item {
@@ -374,4 +408,84 @@ input, select, textarea {
 
 #newCustomerFields .form-group {
     margin-bottom: 1rem;
+}
+
+/* Estilos para mensajes de error */
+.error-message {
+    color: #d32f2f;
+    font-size: 0.95em;
+    margin-top: 4px;
+    min-height: 18px;
+    font-weight: 500;
+}
+
+/* Opcional: resalta el borde del campo con error */
+.form-group input:invalid,
+.form-group select:invalid,
+.form-group textarea:invalid {
+    border-color: #d32f2f;
+}
+
+.input-error {
+    border: 2px solid #d32f2f !important;
+    background-color: #fff0f0;
+}
+
+/* Alinear horizontalmente los botones de acciones del formulario */
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+}
+
+/* Que ambos botones tengan el mismo tamaño */
+.form-actions .btn-secondary,
+.form-actions .btn-submit {
+    flex: 1 1 180px;
+    min-width: 140px;
+    max-width: 220px;
+    justify-content: center;
+}
+
+/* Opcional: en pantallas pequeñas, apilar verticalmente */
+@media (max-width: 600px) {
+    .form-actions {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+}
+
+/* Limitar altura de la lista de productos y mostrar scroll si hay más de 3 */
+.items-container {
+    margin: 1rem 0;
+    border: 1px dashed #e5e7eb;
+    border-radius: 8px;
+    padding: 1rem;
+    min-height: 100px;
+    max-height: 340px; /* Aproximadamente 3-4 productos, ajusta según tu diseño */
+    overflow-y: auto;
+    background: #f9fafb;
+}
+
+/* Scrollbar estilizada para la lista de productos */
+.items-container::-webkit-scrollbar {
+    width: 10px;
+    background: #ede9fe;
+    border-radius: 8px;
+}
+
+.items-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+    border-radius: 8px;
+}
+
+.items-container::-webkit-scrollbar-thumb:hover {
+    background: #4f46e5;
+}
+
+/* Firefox */
+.items-container {
+    scrollbar-width: thin;
+    scrollbar-color: #7c3aed #ede9fe;
 }
