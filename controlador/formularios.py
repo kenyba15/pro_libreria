@@ -25,6 +25,8 @@ def autor():
     autores = obtener_autores()
     return render_template('autor.html', autores=autores)
 
+
+
 @form_bp.route('/autor/editar/<int:id_autor>')
 def editar_autor(id_autor):
     autor = obtener_autor_por_id(id_autor)
