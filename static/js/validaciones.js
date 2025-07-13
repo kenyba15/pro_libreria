@@ -47,14 +47,17 @@ function validarNumeroPositivo(valor, campo) {
 // Validar ISBN (13 dígitos)
 function validarISBN(isbn) {
     if (!isbn || isbn.trim() === '') {
-        return ''; // Campo opcional
+        return 'El ISBN es obligatorio';
     }
-    
+
     if (!/^\d{13}$/.test(isbn)) {
         return 'ISBN inválido (debe tener exactamente 13 dígitos numéricos)';
     }
-    return '';
+
+    return ''; // Válido
 }
+
+
 
 // Validar opciones de radio
 function validarRadio(nombre) {
@@ -89,5 +92,25 @@ function validarEmail(email) {
     if (!re.test(email)) {
         return 'Correo electrónico inválido. Ejemplo válido: usuario@dominio.com';
     }
+    return '';
+}
+
+function validarPrecio(precio) {
+    if (!precio || precio.trim() === '') {
+        return 'El precio es obligatorio';
+    }
+
+    // Validar que sea número con hasta 2 decimales
+    const regex = /^\d+(\.\d{1,2})?$/;
+
+    if (!regex.test(precio)) {
+        return 'El precio debe ser un número válido';
+    }
+
+    const valor = parseFloat(precio);
+    if (valor <= 0) {
+        return 'El precio debe ser mayor a 0';
+    }
+
     return '';
 }

@@ -7,6 +7,12 @@
 
 <h2>Autores</h2>
 
+<form id="form-busqueda" method="GET" action="{{ url_for('form_bp.autor') }}">
+  <input type="text" name="busqueda" id="busqueda-autor" placeholder="Buscar autor..." 
+         style="margin-bottom: 10px; width: 50%; padding: 5px;" 
+         value="{{ request.args.get('busqueda', '') }}" autocomplete="off">
+</form>
+
 <button id="btn-crear-autor" class="btn-primary">Crear Autor</button>
 
 <div id="form-container" style="display:none; margin-top:20px;">

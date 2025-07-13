@@ -6,6 +6,13 @@
 {% block contenido %}
 <h2>Libros</h2>
 
+<form id="form-busqueda" method="GET" action="{{ url_for('form_bp.libro') }}">
+  <input type="text" name="busqueda" id="busqueda-libro" placeholder="Buscar por título..." 
+         style="margin-bottom: 10px; width: 50%; padding: 5px;" 
+         value="{{ request.args.get('busqueda', '') }}" autocomplete="off">
+</form>
+
+
 <button id="btn-crear-libro" class="btn-primary">Crear Libro</button>
 
 <div id="form-container-libro" style="display:none; margin-top:20px;">
@@ -21,8 +28,8 @@
 
             <div class="form-group">
                 <label for="isbn">ISBN:</label>
-                <input type="text" id="isbn" name="isbn">
-                <div class="error-msg" id="error-isbn"></div>
+                <input type="text" id="isbn" name="isbn" value="{{ libro.isbn if libro else '' }}">
+            <div class="error-msg" id="error-isbn"></div>
             </div>
 
             <div class="form-group">
@@ -63,10 +70,25 @@
                 <select id="genero" name="genero">
                     <option value="">Seleccione género...</option>
                     <option value="novela">Novela</option>
-                    <option value="ciencia-ficcion">Ciencia Ficción</option>
-                    <option value="fantasia">Fantasía</option>
-                    <option value="historia">Historia</option>
-                    <option value="tecnico">Técnico</option>
+                    <option value="Fantasía">Fantasía</option>
+                    <option value="Distopía">Distopía</option>
+                    <option value="Realismo mágico">Realismo mágico</option>
+                    <option value="Ficción">Ficción</option>
+                    <option value="Existencialismo">Existencialismo</option>
+                    <option value="Romántico">Romántico</option>
+                    <option value="Drama">Drama</option>
+                    <option value="Poesía">Poesía</option>
+                    <option value="Terror">Terror</option>
+                    <option value="Ensayo">Ensayo</option>
+                    <option value="Aventura">Aventura</option>
+                    <option value="Misterio">Misterio</option>
+                    <option value="Narrativa">Narrativa</option>
+                    <option value="Ciencia ficción">Ciencia ficción</option>
+                    <option value="Ficción histórica">Ficción histórica</option>
+                    <option value="Clásico">Clásico</option>
+                    <option value="Thriller">Thriller</option>
+                    <option value="Autobiografía">Autobiografía</option>
+                    <option value="Espiritualidad">Espiritualidad</option>
                 </select>
                 <div class="error-msg" id="error-genero"></div>
             </div>
@@ -88,15 +110,19 @@
             </div>
 
             <div class="form-group">
+                <label for="precio">Precio:</label>
+                <input type="number" id="precio" name="precio" min="0" step="0.01">
+                <div class="error-msg" id="error-precio"></div>
+            </div>
+
+            <div class="form-group">
                 <label>¿Es Best Seller?</label>
                 <div class="radio-group">
                     <label>
-                    <input type="radio" name="bestSeller" value="false"
-                        {% if libro and not libro.best_seller %}checked{% endif %}> No
+                    <input type="radio" name="bestSeller" value="false" {% if libro and not libro.best_seller %}checked{% endif %}> No
                     </label>
                     <label>
-                    <input type="radio" name="bestSeller" value="true"
-                        {% if libro and libro.best_seller %}checked{% endif %}> Sí
+                    <input type="radio" name="bestSeller" value="true" {% if libro and libro.best_seller %}checked{% endif %}> Sí
                     </label>
                 </div>
             </div>
@@ -122,11 +148,12 @@
                 <th>Género</th>
                 <th>Edición</th>
                 <th>Formato</th>
+                <th>Precio</th>
                 <th>Best Seller</th>
                 <th>Acciones</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="tabla-libros-body">
             {% for l in libros %}
             <tr>
                 <td>{{ l.id_libro }}</td>
@@ -138,6 +165,7 @@
                 <td>{{ l.genero }}</td>
                 <td>{{ l.edicion }}</td>
                 <td>{{ l.formato }}</td>
+                <td>{{ l.precio }}</td>
                 <td>{{ 'Sí' if l.best_seller == 1 else 'No' }}</td>
                 <td>
                     <a href="#" class="editar-libro"
@@ -150,6 +178,7 @@
                        data-genero="{{ l.genero }}"
                        data-edicion="{{ l.edicion }}"
                        data-formato="{{ l.formato }}"
+                       data-precio="{{ l.precio }}"
                        data-best_seller="{{ l.best_seller }}">Editar</a>
                     |
                     <a href="{{ url_for('form_bp.eliminar_libro_ruta', id_libro=l.id_libro) }}" onclick="return confirm('¿Eliminar libro?')">Eliminar</a>
@@ -165,10 +194,6 @@
 <script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
 <script src="{{ url_for('static', filename='js/maneFor.js') }}"></script>
 <script src="{{ url_for('static', filename='js/libro.js') }}"></script>
-
-<!-- Select2 para autores -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="{{ url_for('static', filename='js/libro.js') }}"></script>
-
 {% endblock %}

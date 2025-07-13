@@ -49,3 +49,10 @@ $(document).ready(function() {
         $('#error-correo').text('');
     }
 });
+
+document.getElementById('busqueda-editorial').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    document.getElementById('form-busqueda').submit();
+  }
+});

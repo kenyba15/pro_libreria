@@ -62,6 +62,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     case 'isbn':
                         error = validarISBN(valor);
                         break;
+                    case 'precio':
+                        error = validarPrecio(valor);
+                        break;
+
                 }
                 
                 // Solo mostrar error si existe
@@ -120,7 +124,15 @@ function validarFormulario(formId) {
             );
             
             errors.formato = validarRadio('formato');
+
+            errors.precio = validarPrecio(
+                document.getElementById('precio').value
+            );
+            errors.bestSeller = validarRadio('bestSeller');
+
             break;
+
+            
             
             case 'form-editorial':
             errors.nombre = validarNombre(document.getElementById('nombre').value, 

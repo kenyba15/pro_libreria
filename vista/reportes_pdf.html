@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ titulo }}</title>
+    <style>
+        table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        }
+
+        th, td {
+        border: 1px solid #ddd;
+        padding: 5px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+        }
+
+        th {
+        background-color: #3498db;
+        color: white;
+        }
+
+        th.edicion, td.edicion {
+        width: 8%;
+        }
+
+        th.total_vendido, td.total_vendido {
+        width: 10%;
+        }
+
+        th.formato, td.formato {
+        width: 15%;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ titulo }}</h1>
+
+    {% if tipo_reporte == 'baja_rotacion' %}
+    <table>
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>ISBN</th>
+                <th>Idioma</th>
+                <th>Género</th>
+                <th class="edicion">Edición</th>
+                <th class="formato">Formato</th>
+                <th>Precio</th>
+                <th class="total_vendido">Total Vendido</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for libro in resultados %}
+            <tr>
+                <td>{{ libro.titulo }}</td>
+                <td>{{ libro.isbn }}</td>
+                <td>{{ libro.idioma }}</td>
+                <td>{{ libro.genero }}</td>
+                <td class="edicion">{{ libro.edicion }}</td>
+                <td class="formato">{{ libro.formato }}</td>
+                <td>{{ libro.precio }}</td>
+                <td  class="total_vendido">{{ libro.total_vendido }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% elif tipo_reporte == 'best_seller' %}
+    <table>
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>ISBN</th>
+                <th>Idioma</th>
+                <th>Género</th>
+                <th class="edicion">Edición</th>
+                <th>Formato</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for libro in resultados %}
+            <tr>
+                <td>{{ libro.titulo }}</td>
+                <td>{{ libro.isbn }}</td>
+                <td>{{ libro.idioma }}</td>
+                <td>{{ libro.genero }}</td>
+                <td class="edicion">{{ libro.edicion }}</td>
+                <td>{{ libro.formato }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</body>
+</html>

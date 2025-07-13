@@ -1,12 +1,20 @@
 from modelo.conexion import obtener_conexion
 
-def obtener_autores():
+def obtener_autores(busqueda=''):
     conexion = obtener_conexion()
     cursor = conexion.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM autor WHERE estado = 1")
+    sql = "SELECT * FROM autor WHERE estado = 1"
+    params = ()
+
+    if busqueda:
+        sql += " AND nombre LIKE %s"
+        params = (f"%{busqueda}%",)
+
+    cursor.execute(sql, params)
     autores = cursor.fetchall()
     conexion.close()
     return autores
+
 
 def insertar_autor(nombre, correo):
     conexion = obtener_conexion()
