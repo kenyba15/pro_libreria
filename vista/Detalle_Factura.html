@@ -13,60 +13,62 @@
         <h2>Detalle de Factura</h2>
     </div>
 
+    <script>
+        
+        console.log("factura_id (crudo Jinja2): '{{ factura_id }}'"); 
+        
+        // 2. Imprime el valor de factura_id DESPUÉS de tojson
+        console.log("factura_id (después de tojson): '{{ factura_id | tojson }}'");
+
+       
+        let FACTURA_ID;
+    try {
+        // Usamos JSON.parse para evitar inyección de código
+        FACTURA_ID = JSON.parse('{{ factura_id | tojson | safe }}');
+        console.log("FACTURA_ID asignado correctamente:", FACTURA_ID);
+    } catch (e) {
+        console.error("Error al parsear factura_id:", e);
+        FACTURA_ID = null; // Valor por defecto
+        alert("Error al cargar la factura. Recarga la página.");
+    }
+    </script>
     <div class="info-factura">
-        <p><strong>Número de Factura:</strong> LIB-2025-00158</p>
-        <p><strong>Fecha:</strong> 20/06/2025</p>
-        <p><strong>Cliente:</strong> María González</p>
-        <p><strong>RUC/DNI:</strong> 10876543210</p>
+        <p><strong>Número de Factura:</strong> <span id="factura-numero">Cargando...</span></p>
+        <p><strong>Fecha:</strong> <span id="factura-fecha">Cargando...</span></p>
+        <p><strong>Cliente:</strong> <span id="cliente-nombre">Cargando...</span></p>
+        <p><strong>Dirección:</strong> <span id="cliente-direccion">Cargando...</span></p>
+        <p><strong>Método de Pago:</strong> <span id="metodo-pago">Cargando...</span></p>
+        <p><strong>Notas:</strong> <span id="factura-notas">Sin notas</span></p>
     </div>
 
     <table class="tabla-productos">
         <thead>
             <tr>
-                <th>Código</th>
-                <th>Libro</th>
-                <th>Autor</th>
+                <th>Descripción</th>
                 <th>Cantidad</th>
                 <th>Precio Unit.</th>
-                <th>Subtotal</th>
+                <th>Total</th>
             </tr>
         </thead>
-        <tbody>
-            <tr>
-                <td>LIB-1001</td>
-                <td>Cien años de soledad</td>
-                <td>Gabriel García Márquez</td>
-                <td>1</td>
-                <td>$ 65.00</td>
-                <td>$ 65.00</td>
-            </tr>
-            <tr>
-                <td>LIB-2045</td>
-                <td>La ciudad y los perros</td>
-                <td>Mario Vargas Llosa</td>
-                <td>2</td>
-                <td>$ 55.00</td>
-                <td>$ 110.00</td>
-            </tr>
-            <tr>
-                <td>LIB-3098</td>
-                <td>Rayuela</td>
-                <td>Julio Cortázar</td>
-                <td>1</td>
-                <td>$ 70.00</td>
-                <td>$ 70.00</td>
-            </tr>
+        <tbody id="detalles-factura-body">
+            <tr><td colspan="4">Cargando detalles...</td></tr>
         </tbody>
     </table>
 
     <div class="totales">
-        <p><strong>Subtotal:</strong> $ 245.00</p>
-        <p><strong>IVA (15%):</strong> $ 36.75</p>
-        <p class="total-final"><strong>Total:</strong> $ 281.75</p>
+        <p><strong>Subtotal:</strong> <span id="detalle-subtotal">$ 0.00</span></p>
+        <p><strong>Impuesto:</strong> <span id="detalle-impuesto">$ 0.00</span></p>
+        <p><strong>Descuento:</strong> <span id="detalle-descuento">$ 0.00</span></p>
+        <p class="total-final"><strong>Total Final:</strong> <span id="detalle-total-final">$ 0.00</span></p>
     </div>
 
     <div class="footer">
         <p>Gracias por su compra</p>
+        <div class="acciones">
+            <button onclick="window.history.back()" class="btn btn-primary">Volver</button>
+        </div>
     </div>
 </div>
+
+<script src="{{ url_for('static', filename='js/Detalle_Factura.js') }}"></script>
 {% endblock %}

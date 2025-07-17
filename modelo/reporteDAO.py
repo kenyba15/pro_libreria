@@ -31,6 +31,57 @@ def obtener_libros_best_seller():
     """
     cursor.execute(sql)
     resultados = cursor.fetchall()
-    cursor.close()
+    cursor.close()  
     conexion.close()
     return resultados
+
+
+def obtener_libros_por_genero():
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+    sql = """
+    SELECT
+    l.genero,
+    l.id_libro,
+    l.isbn,
+    l.titulo,
+    GROUP_CONCAT(DISTINCT a.nombre SEPARATOR ', ') AS autores,
+    ed.nombre AS editorial,
+    l.precio,
+    l.best_seller,  -- Aquí traes el valor crudo (1 o 0)
+    SUM(df.cantidad) AS total_vendido
+    FROM libro l
+    JOIN detalle_factura df ON l.id_libro = df.id_libro
+    LEFT JOIN libro_autor la ON l.id_libro = la.id_libro
+    LEFT JOIN autor a ON la.id_autor = a.id_autor
+    LEFT JOIN editorial ed ON l.id_editorial = ed.id_editorial
+    WHERE l.estado = 1
+    GROUP BY l.genero, l.id_libro
+    HAVING SUM(df.cantidad) >= 1
+    ORDER BY l.genero, total_vendido DESC;
+    """
+       
+    try:
+        cursor.execute(sql)
+        libros = cursor.fetchall()
+    except Exception as e: # Captura cualquier error de SQL
+        print(f"Error al obtener libros por género: {e}")
+        libros = []
+    finally:
+        cursor.close()
+        conexion.close()
+
+    libros_por_genero_agrupados = {}
+    for libro in libros:
+        genero = libro['genero']
+        if genero not in libros_por_genero_agrupados:
+            libros_por_genero_agrupados[genero] = {
+                'libros': [],
+                'total_libros_genero': 0
+            }
+        
+        libros_por_genero_agrupados[genero]['libros'].append(libro)
+        libros_por_genero_agrupados[genero]['total_libros_genero'] += 1
+    
+    return libros_por_genero_agrupados
+

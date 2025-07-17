@@ -17,6 +17,7 @@
         <option value="">-- Seleccionar --</option>
         <option value="baja_rotacion" {% if tipo_reporte == 'baja_rotacion' %}selected{% endif %}>Libros Baja Rotación</option>
         <option value="best_seller" {% if tipo_reporte == 'best_seller' %}selected{% endif %}>Libros Best Seller</option>
+        <option value="por_genero_quiebre" {% if tipo_reporte == 'por_genero_quiebre' %}selected{% endif %}>Libros más vendidos por Género</option>
     </select>
 </form>
 
@@ -83,6 +84,45 @@
             {% endfor %}
         </tbody>
     </table>
+
+    {% elif tipo_reporte == 'por_genero_quiebre' %}
+    <h2>Libros más vendidos por Género</h2> 
+    {% if libros_por_genero_agrupados %}
+        {% for genero, data in libros_por_genero_agrupados.items() %}   
+            <h3>{{ genero }}</h3>
+            <table class="tabla-reportes">
+                <thead>
+                    <tr>
+                        <th>ISBN</th>
+                        <th>Título</th>
+                        <th>Autor</th>
+                        <th>Editorial</th>
+                        <th>Precio</th>
+                        <th>Best Seller</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for libro in data.libros %}
+                    <tr>
+                        <td>{{ libro.isbn }}</td>
+                        <td>{{ libro.titulo }}</td>
+                        <td>{{ libro.autores | default('N/A') }}</td>
+                        <td>{{ libro.editorial | default('N/A') }}</td> 
+                        <td>{{ "%.2f"|format(libro.precio) }}</td>
+                        <td>{{ 'Sí' if libro.best_seller == 1 else 'No' }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="total-row">
+                        <td colspan="5" style="text-align: right; font-weight: bold;">TOTAL {{ genero }}:</td>
+                        <td style="font-weight: bold;">{{ data.total_libros_genero }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <br> {# Espacio entre cada tabla de género #}
+        {% endfor %}
+    {% else %}
+        <p>No se encontraron datos para los libros más vendidos por género.</p>
+    {% endif %}
 {% endif %}
 
 <!-- Botón para generar PDF solo si hay tipo seleccionado -->

@@ -4,11 +4,13 @@ from modelo.autorDAO import obtener_autores, insertar_autor, actualizar_autor, e
 from modelo.editorialDAO import obtener_editoriales, insertar_editorial, actualizar_editorial, eliminar_editorial, obtener_editorial_por_id
 from modelo.libroDAO import obtener_libros, insertar_libro, actualizar_libro, eliminar_libro, obtener_libro_por_id, insertar_autores_libro, actualizar_autores_libro, obtener_libros_factura
 from modelo.facturaDAO import insertar_cliente, insertar_factura, insertar_detalles_factura
+from modelo.Detalle_FacturaDAO import obtener_factura_completa_por_id
 from modelo.clienteDAO import insertar_cliente, obtener_clientes, actualizar_cliente, eliminar_cliente, buscar_cliente_por_cedula, obtener_cliente_por_id
-from modelo.reporteDAO import obtener_libros_baja_rotacion, obtener_libros_best_seller
+from modelo.reporteDAO import obtener_libros_baja_rotacion, obtener_libros_best_seller, obtener_libros_por_genero
 from datetime import datetime, timedelta
 from modelo.actividadDAO import registrar_actividad, obtener_ultimas_actividades, contar_libros, contar_autores, contar_editoriales
 from flask import make_response, render_template
+from modelo.conexion import obtener_conexion
 from xhtml2pdf import pisa
 import io
 
@@ -163,9 +165,20 @@ def eliminar_editorial_ruta(id_editorial):
 def ui_factura():
     return render_template('uiFactura.html')
 
-@form_bp.route('/Detalle_Factura')
-def detalle_f():
-    return render_template('Detalle_Factura.html')
+
+@form_bp.route('/detalle_factura/<int:factura_id>')
+def mostrar_detalle_factura(factura_id):
+    return render_template('Detalle_Factura.html', factura_id=factura_id)
+
+                
+@form_bp.route('/api/factura/<int:factura_id>', methods=['GET'])
+def get_factura_by_id(factura_id):
+    factura_data = obtener_factura_completa_por_id(factura_id)
+    if factura_data:
+        return jsonify(factura_data)
+    else:
+        return jsonify({"error": "Factura no encontrada"}), 404
+    
 
 @form_bp.route('/api/factura', methods=['POST'])
 def api_factura():
@@ -207,6 +220,7 @@ def api_factura():
         print("Error:", e)
         return jsonify({'error': 'Error al crear la factura'}), 500
     
+
     # Obtener todos los clientes
 @form_bp.route('/api/clientes', methods=['GET'])
 def api_get_clientes():
@@ -286,6 +300,7 @@ def reportes():
 
     libros_baja_rotacion = []
     libros_best_seller = []
+    libros_por_genero_agrupados =[]
 
     if tipo_reporte == 'baja_rotacion':
         libros_baja_rotacion = obtener_libros_baja_rotacion()
@@ -293,10 +308,15 @@ def reportes():
     elif tipo_reporte == 'best_seller':
         libros_best_seller = obtener_libros_best_seller()
 
+    elif tipo_reporte == 'por_genero_quiebre': 
+        libros_por_genero_agrupados = obtener_libros_por_genero()
+
     return render_template('reportes.html',
                            tipo_reporte=tipo_reporte,
                            libros_baja_rotacion=libros_baja_rotacion,
-                           libros_best_seller=libros_best_seller)
+                           libros_best_seller=libros_best_seller,
+                           libros_por_genero_agrupados=libros_por_genero_agrupados) 
+
 
 
 @form_bp.route('/reportes/pdf')
@@ -304,30 +324,36 @@ def generar_pdf():
     tipo = request.args.get('tipo', '')
 
     if not tipo:
-        # en vez de generar pdf, recarga la página de reportes con un mensaje de error
         error = "Debe seleccionar un tipo de reporte para generar el PDF."
-        return render_template('reportes.html', tipo_reporte='', libros_baja_rotacion=[], libros_best_seller=[], error=error)
+        return render_template('reportes.html', error=error)
 
     if tipo == 'baja_rotacion':
         resultados = obtener_libros_baja_rotacion()
         titulo = "Reporte de Libros de Baja Rotación"
+        return render_pdf('reportes_pdf.html', resultados=resultados, titulo=titulo, tipo_reporte=tipo)
+
     elif tipo == 'best_seller':
         resultados = obtener_libros_best_seller()
         titulo = "Reporte de Libros Best Seller"
+        return render_pdf('reportes_pdf.html', resultados=resultados, titulo=titulo, tipo_reporte=tipo)
+
+    elif tipo == 'por_genero_quiebre':
+        libros_por_genero_agrupados = obtener_libros_por_genero()
+        titulo = "Reporte de Libros Más Vendidos por Género"
+        return render_pdf('reportes_pdf.html', libros_por_genero_agrupados=libros_por_genero_agrupados, titulo=titulo, tipo_reporte=tipo)
+
     else:
         error = "Tipo de reporte no válido."
-        return render_template('reportes.html', tipo_reporte='', libros_baja_rotacion=[], libros_best_seller=[], error=error)
+        return render_template('reportes.html', error=error)
 
-    html = render_template('reportes_pdf.html', resultados=resultados, titulo=titulo, tipo_reporte=tipo)
-
+def render_pdf(template, **kwargs):
+    html = render_template(template, **kwargs)
     buffer = io.BytesIO()
     pisa_status = pisa.CreatePDF(html, dest=buffer)
-
     if pisa_status.err:
         error = "Error al generar el PDF."
-        return render_template('reportes.html', tipo_reporte=tipo, error=error)
-
+        return render_template('reportes.html', error=error)
     response = make_response(buffer.getvalue())
     response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = f'attachment; filename={tipo}_reporte.pdf'
+    response.headers['Content-Disposition'] = f'attachment; filename={kwargs.get("tipo_reporte", "reporte")}.pdf'
     return response

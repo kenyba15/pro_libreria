@@ -68,6 +68,7 @@
             {% endfor %}
         </tbody>
     </table>
+
     {% elif tipo_reporte == 'best_seller' %}
     <table>
         <thead>
@@ -93,6 +94,35 @@
             {% endfor %}
         </tbody>
     </table>
+
+    {% elif tipo_reporte == 'por_genero_quiebre' %}
+      {% for genero, data in libros_por_genero_agrupados.items() %}
+        <h2>Género: {{ genero }} ({{ data.total_libros_genero }})</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>ISBN</th>
+              <th>Autor(es)</th>
+              <th>Editorial</th>
+              <th>Precio</th>
+              <th>Total Vendido</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for libro in data.libros %}
+            <tr>
+              <td>{{ libro.titulo }}</td>
+              <td>{{ libro.isbn }}</td>
+              <td>{{ libro.autores }}</td>
+              <td>{{ libro.editorial }}</td>
+              <td>{{ libro.precio }}</td>
+              <td>{{ libro.total_vendido }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>  
+      {% endfor %}
     {% endif %}
 </body>
 </html>

@@ -15,3 +15,5 @@ def abrir_navegador():
 if __name__ == '__main__':  
     threading.Timer(1.0, abrir_navegador).start()
     app.run(debug=True)
+
+
