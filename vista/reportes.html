@@ -17,6 +17,8 @@
         <option value="">-- Seleccionar --</option>
         <option value="baja_rotacion" {% if tipo_reporte == 'baja_rotacion' %}selected{% endif %}>Libros Baja Rotación</option>
         <option value="best_seller" {% if tipo_reporte == 'best_seller' %}selected{% endif %}>Libros Best Seller</option>
+        <option value="ventas_mensuales" {% if tipo_reporte == 'ventas_mensuales' %}selected{% endif %}>Ventas Mensuales</option>
+        <option value="ventas_anuales" {% if tipo_reporte == 'ventas_anuales' %}selected{% endif %}>Ventas Anuales</option>
     </select>
 </form>
 
@@ -80,6 +82,46 @@
             </tr>
             {% else %}
             <tr><td colspan="7">No hay libros best seller.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% elif tipo_reporte == 'ventas_mensuales' %}
+    <h2>Reporte de Ventas Mensuales</h2>
+    <table class="tabla-reportes">
+        <thead>
+            <tr>
+                <th>Mes</th>
+                <th>Total Facturas</th>
+                <th>Total Ventas ($)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for fila in ventas_mensuales %}
+            <tr>
+                <td>{{ fila.mes }}</td>
+                <td>{{ fila.total_facturas }}</td>
+                <td>{{ "%.2f"|format(fila.total_ventas) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% elif tipo_reporte == 'ventas_anuales' %}
+    <h2>Reporte de Ventas Anuales</h2>
+    <table class="tabla-reportes">
+        <thead>
+            <tr>
+                <th>Año</th>
+                <th>Total Facturas</th>
+                <th>Total Ventas ($)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for fila in ventas_anuales %}
+            <tr>
+                <td>{{ fila.anio }}</td>
+                <td>{{ fila.total_facturas }}</td>
+                <td>{{ "%.2f"|format(fila.total_ventas) }}</td>
+            </tr>
             {% endfor %}
         </tbody>
     </table>

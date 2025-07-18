@@ -34,3 +34,43 @@ def obtener_libros_best_seller():
     cursor.close()
     conexion.close()
     return resultados
+
+def obtener_ventas_mensuales():
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+    sql = """
+    SELECT 
+        DATE_FORMAT(f.fecha, '%Y-%m') AS mes,
+        COUNT(f.id_factura) AS total_facturas,
+        SUM(df.cantidad * df.precio_unitario) AS total_ventas
+    FROM factura f
+    JOIN detalle_factura df ON f.id_factura = df.id_factura
+    WHERE f.estado = 1 AND df.estado = 1
+    GROUP BY mes
+    ORDER BY mes DESC;
+    """
+    cursor.execute(sql)
+    resultados = cursor.fetchall()
+    cursor.close()
+    conexion.close()
+    return resultados
+
+def obtener_ventas_anuales():
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+    sql = """
+    SELECT 
+        YEAR(f.fecha) AS anio,
+        COUNT(f.id_factura) AS total_facturas,
+        SUM(df.cantidad * df.precio_unitario) AS total_ventas
+    FROM factura f
+    JOIN detalle_factura df ON f.id_factura = df.id_factura
+    WHERE f.estado = 1 AND df.estado = 1
+    GROUP BY anio
+    ORDER BY anio DESC;
+    """
+    cursor.execute(sql)
+    resultados = cursor.fetchall()
+    cursor.close()
+    conexion.close()
+    return resultados

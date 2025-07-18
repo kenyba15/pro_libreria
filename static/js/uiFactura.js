@@ -71,13 +71,16 @@ function updateTotals() {
         subtotal += totalItem;
         item.querySelector('.item-total').textContent = '$' + totalItem.toFixed(2);
     });
+    // Calcular impuesto
     const taxRate = IVA_PORCENTAJE / 100;
-    const tax = subtotal * taxRate;
-    const total = subtotal + tax;
+    const tax = subtotal * taxRate; // Calcular el impuesto basado en el subtotal
+    const total = subtotal + tax; // Calcular el total
+    // Actualizar los elementos de la interfaz
     document.getElementById('subtotal').textContent = "$" + subtotal.toFixed(2);
-    document.getElementById('tax').textContent = IVA_PORCENTAJE;
+    document.getElementById('tax').textContent = "$" + tax.toFixed(2); // Mostrar el cálculo del impuesto
     document.getElementById('total').textContent = "$" + total.toFixed(2);
-    updatePreview();
+    
+    updatePreview(); // Actualizar la vista previa
 }
 
 
@@ -206,57 +209,6 @@ function updatePreview() {
     `;
 }
 
-// Enviar factura
-async function submitInvoice() {
-    const customerSelect = document.getElementById('customer');
-    const customerId = customerSelect.value;
-    const customerName = customerSelect.options[customerSelect.selectedIndex].text;
-    const address = document.getElementById('shippingAddress').value;
-    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
-    const notes = document.getElementById('notes').value;
-
-    const invoiceData = {
-        cliente: {
-            nombre: customerName,
-            email: document.getElementById('newCustomerEmail').value,
-            telefono: document.getElementById('newCustomerPhone').value,
-            direccion: address,
-            cedula: document.getElementById('newCustomerCedula').value
-        },
-        factura: {
-            fecha: new Date().toISOString().split('T')[0],
-            descuento: 0,
-            impuesto: IVA_PORCENTAJE,
-            metodo_pago: paymentMethod,
-            notas: notes
-        },
-        detalles: Array.from(document.querySelectorAll('.invoice-item')).map(item => ({
-            id_libro: item.querySelector('.item-description').value, // Cambia esto según tu lógica
-            cantidad: parseFloat(item.querySelector('.item-quantity').value) || 0,
-            precio_unitario: parseFloat(item.querySelector('.item-price').value) || 0
-        }))
-    };
-
-    try {
-        const response = await fetch('/api/factura', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(invoiceData)
-        });
-
-        if (!response.ok) {
-            throw new Error('Error al crear la factura');
-        }
-
-        const result = await response.json();
-        showMessage('Factura creada exitosamente con ID: ' + result.id_factura);
-        resetForm();
-    } catch (error) {
-        showMessage('Error: ' + error.message);
-    }
-}
 
 // Mostrar mensajes en la interfaz
 function showMessage(message) {
@@ -265,35 +217,24 @@ function showMessage(message) {
     messageContainer.style.display = 'block';
 }
 
-// Limpiar el formulario
-function resetForm() {
-    document.getElementById('facturaForm').reset();
-    document.getElementById('invoiceItems').innerHTML = '';
-    itemCount = 0;
-    updateTotals();
-    document.querySelector('.preview-content').innerHTML = '';
-}
+document.addEventListener('DOMContentLoaded', async function () {
+    // Cargar libros disponibles desde la base de datos
+    await cargarLibros();
 
-// Inicializar la factura
-document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('facturaForm');
 
-    // Asigna el valor del impuesto al campo correspondiente
+    // Asigna el valor del impuesto al campo y al texto visible
     document.getElementById('tax').value = IVA_PORCENTAJE;
+    document.getElementById('tax-percentage').textContent = IVA_PORCENTAJE + '%';
 
-    // Agregar un ítem inicial
+    // Agrega un ítem inicial automáticamente
     document.getElementById('addItemBtn').click();
 
-    // Event listeners para los controles
-    document.getElementById('customer').addEventListener('change', updatePreview);
-    document.getElementById('shippingAddress').addEventListener('input', updatePreview);
-    document.getElementById('notes').addEventListener('input', updatePreview);
-    document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
-        radio.addEventListener('change', updatePreview);
-    });
+    document.querySelector('.btn-secondary').addEventListener('click', resetForm);
 
-    // Agregar ítem
-    document.getElementById('addItemBtn').addEventListener('click', function() {
+
+    // Event listener para agregar un nuevo ítem
+    document.getElementById('addItemBtn').addEventListener('click', function () {
         itemCount++;
         document.getElementById('invoiceItems').insertAdjacentHTML('beforeend', getInvoiceItemTemplate(itemCount));
         const newItem = document.querySelector(`.invoice-item[data-id="${itemCount}"]`);
@@ -301,23 +242,23 @@ document.addEventListener('DOMContentLoaded', function() {
         updateTotals();
     });
 
-    // Eliminar ítem (usando delegación de eventos)
-    document.getElementById('invoiceItems').addEventListener('click', function(e) {
+    // Delegación para eliminar ítems
+    document.getElementById('invoiceItems').addEventListener('click', function (e) {
         if (e.target.classList.contains('remove-item') || e.target.closest('.remove-item')) {
             e.target.closest('.invoice-item').remove();
             updateTotals();
         }
     });
 
-    // Enviar formulario
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        submitInvoice();
+    // Event listeners generales para actualizar vista previa
+    document.getElementById('customer').addEventListener('change', updatePreview);
+    document.getElementById('shippingAddress').addEventListener('input', updatePreview);
+    document.getElementById('notes').addEventListener('input', updatePreview);
+    document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
+        radio.addEventListener('change', updatePreview);
     });
-
-    // Inicializar la vista previa
-    updatePreview();
 });
+
 
 // Llama a esta función después de agregar un nuevo producto
 function addProductListeners(itemRow) {
@@ -325,41 +266,6 @@ function addProductListeners(itemRow) {
     itemRow.querySelector('.item-price').addEventListener('input', updateTotals);
     itemRow.querySelector('.item-description').addEventListener('input', updateTotals);
 }
-
-// Inicialización cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', async function() {
-    // Cargar libros disponibles
-    await cargarLibros();
-    
-    // Configurar el formulario
-    const form = document.getElementById('facturaForm');
-    document.getElementById('tax').value = IVA_PORCENTAJE;
-
-    // Event listeners para los controles
-    document.getElementById('customer').addEventListener('change', updatePreview);
-    document.getElementById('shippingAddress').addEventListener('input', updatePreview);
-    document.getElementById('notes').addEventListener('input', updatePreview);
-    document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
-        radio.addEventListener('change', updatePreview);
-    });
-
-    // Eliminar ítem (usando delegación de eventos)
-    document.getElementById('invoiceItems').addEventListener('click', function(e) {
-        if (e.target.classList.contains('remove-item') || e.target.closest('.remove-item')) {
-            e.target.closest('.invoice-item').remove();
-            updateTotals();
-        }
-    });
-
-    // Enviar formulario
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        submitInvoice();
-    });
-
-    // Inicializar vista previa
-    updatePreview();
-});
 
 // Función para agregar listeners a los productos
 function addProductListeners(itemRow) {
@@ -382,6 +288,10 @@ document.getElementById('customer').addEventListener('change', async function() 
     const selectedOption = this.options[this.selectedIndex];
     
     if (selectedOption.text === 'Consumidor final') {
+        // Bloquear botones de buscar y agregar cliente
+        document.getElementById('btnBuscarCliente').disabled = true;
+        document.getElementById('btnNuevoCliente').disabled = true;
+
         const customerCedula = '9999999999'; // Aquí deberías usar la cédula correcta
         try {
             const response = await fetch(`/api/clientes/cedula/${customerCedula}`);
@@ -404,14 +314,17 @@ document.getElementById('customer').addEventListener('change', async function() 
             console.error('Error:', error);
             showMessage('Error al buscar el cliente: ' + error.message);
         }
-    } 
-    else if (selectedOption.text === 'Datos') {
+    } else if (selectedOption.text === 'Datos') {
         // Limpiar y habilitar campos cuando se selecciona "Datos"
         ['newCustomerName', 'newCustomerEmail', 'newCustomerPhone', 'shippingAddress', 'newCustomerCedula'].forEach(id => {
             const field = document.getElementById(id);
             field.value = '';  // Limpiar el valor
         });
-        document.getElementById('newCustomerCedula').disabled = false; // Aseg
+        document.getElementById('newCustomerCedula').disabled = false; // Habilitar solo cédula
+
+        // Habilitar botones de buscar y agregar cliente
+        document.getElementById('btnBuscarCliente').disabled = false;
+        document.getElementById('btnNuevoCliente').disabled = false;
     }
 });
 
@@ -514,12 +427,20 @@ document.getElementById('btnNuevoCliente').addEventListener('click', async funct
         errorEmail.textContent = 'Se debe ingresar datos';
         errorEmail.style.display = 'block';
         valid = false;
+    } else if (!validarEmail(email)) {
+        errorEmail.textContent = 'Ingrese un correo válido';
+        errorEmail.style.display = 'block';
+        valid = false;
     }
 
     if (!telefono) {
         errorTelefono.textContent = 'Se debe ingresar datos';
         errorTelefono.style.display = 'block';
         valid = false;
+    } else if (!await validarTelefonoCompleto(telefono)) {
+        errorTelefono.textContent = 'Número no registrado o inválido. Ecuador: 09XXXXXXX. Extranjero: +CCXXXXXXX';
+        errorTelefono.style.display = 'block';
+        return;
     }
 
     if (!direccion) {
@@ -532,8 +453,8 @@ document.getElementById('btnNuevoCliente').addEventListener('click', async funct
         errorCedula.textContent = 'Se debe ingresar datos';
         errorCedula.style.display = 'block';
         valid = false;
-    } else if (cedula.length !== 10) {
-        errorCedula.textContent = 'La cédula debe tener 10 dígitos';
+    } else if (!validarCedula(cedula)) {
+        errorCedula.textContent = 'La cédula ingresada no es válida';
         errorCedula.style.display = 'block';
         valid = false;
     }
@@ -562,77 +483,77 @@ document.getElementById('btnNuevoCliente').addEventListener('click', async funct
         if (!response.ok) throw new Error('Error al agregar el cliente');
 
         const result = await response.json();
-        showMessage('Cliente agregado exitosamente con ID: ' + result.id_cliente);
-        resetForm(); // Limpiar el formulario después de agregar el cliente
+        alert('Cliente agregado exitosamente con ID: ' + result.id_cliente); // Ventana emergente
 
     } catch (error) {
         console.error('Error:', error);
-        showMessage('Error: ' + error.message);
+        alert('Error: ' + error.message); // Ventana emergente para errores
     }
 });
 
+
 function resetForm() {
-    // Limpiar los campos
-    document.getElementById('newCustomerName').value = '';
-    document.getElementById('newCustomerEmail').value = '';
-    document.getElementById('newCustomerPhone').value = '';
-    document.getElementById('shippingAddress').value = '';
-    document.getElementById('newCustomerCedula').value = '';
+    // Resetear el formulario
+    document.getElementById('facturaForm').reset();
 
-    // Habilitar el campo de cédula
-    document.getElementById('newCustomerCedula').disabled = false;
-
-    // Deshabilitar los demás campos
-    ['newCustomerName', 'newCustomerEmail', 'newCustomerPhone', 'shippingAddress'].forEach(id => {
-        document.getElementById(id).disabled = true;
+    // Limpiar y deshabilitar campos del cliente
+    ['newCustomerCedula', 'newCustomerName', 'newCustomerEmail', 'newCustomerPhone', 'shippingAddress'].forEach(id => {
+        const el = document.getElementById(id);
+        el.value = '';
+        el.disabled = id !== 'newCustomerCedula'; // Solo cédula habilitada
     });
 
-    // Limpiar mensajes de error
-    ['newCustomerName', 'newCustomerEmail', 'newCustomerPhone', 'shippingAddress', 'newCustomerCedula'].forEach(id => {
-        const errorMessageContainer = document.getElementById('error-' + id.replace('newCustomer', '').toLowerCase());
-        errorMessageContainer.style.display = 'none';
-        errorMessageContainer.textContent = '';
+    // Resetear mensajes de error
+    ['newCustomerCedula', 'newCustomerName', 'newCustomerEmail', 'newCustomerPhone', 'shippingAddress'].forEach(id => {
+        const errorContainer = document.getElementById('error-' + id);
+        if (errorContainer) {
+            errorContainer.style.display = 'none';
+            errorContainer.textContent = '';
+        }
     });
-}
-document.querySelector('.btn-secondary').addEventListener('click', function() {
-    // Limpiar todos los campos
-    document.getElementById('newCustomerName').value = '';
-    document.getElementById('newCustomerEmail').value = '';
-    document.getElementById('newCustomerPhone').value = '';
-    document.getElementById('shippingAddress').value = '';
-    document.getElementById('newCustomerCedula').value = '';
 
-    // Deshabilitar todos los campos excepto el de cédula
-    ['newCustomerName', 'newCustomerEmail', 'newCustomerPhone', 'shippingAddress'].forEach(id => {
-        document.getElementById(id).disabled = true;
-    });
-    document.getElementById('newCustomerCedula').disabled = false; // Habilitar solo cédula
-
-    // Restablecer el combobox a su posición inicial
+    // Resetear selección del cliente
     document.getElementById('customer').selectedIndex = 0;
 
-    // Eliminar todos los artículos
-    document.getElementById('invoiceItems').innerHTML = '';
-
-    // Desmarcar todos los radio buttons
-    document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
-        radio.checked = false;
-    });
-
-    // Limpiar mensajes de error
-    ['newCustomerName', 'newCustomerEmail', 'newCustomerPhone', 'shippingAddress', 'newCustomerCedula'].forEach(id => {
-        const errorMessageContainer = document.getElementById('error-' + id.replace('newCustomer', '').toLowerCase());
-        errorMessageContainer.style.display = 'none';
-        errorMessageContainer.textContent = '';
-    });
-
-    // Resetear los spans de subtotal y total
+    // Limpiar totales (spans)
     document.getElementById('subtotal').textContent = '$0.00';
+    document.getElementById('tax').textContent = '$0.00';
+    document.getElementById('discount').textContent = '$0.00';
     document.getElementById('total').textContent = '$0.00';
-});
 
+    // Limpiar artículos y reiniciar contador
+    document.getElementById('invoiceItems').innerHTML = '';
+    itemCount = 0;
+
+    // Ocultar y limpiar vista previa
+    document.querySelector('.preview-content').innerHTML = '';
+
+    // Limpiar notas
+    document.getElementById('notes').value = '';
+
+    // Limpiar selección de método de pago
+    document.querySelectorAll('input[name="paymentMethod"]').forEach(el => el.checked = false);
+
+    // Recalcular totales
+    updateTotals();
+
+    updatePreview
+}
+
+
+function addItem() {
+    itemCount++;
+    document.getElementById('invoiceItems').insertAdjacentHTML('beforeend', getInvoiceItemTemplate(itemCount));
+    const newItem = document.querySelector(`.invoice-item[data-id="${itemCount}"]`);
+    addProductListeners(newItem);
+    updateTotals();
+}
+
+// Enviar factura
 async function submitInvoice() {
-    const customerSelect = document.getElementById('customer');
+    if (isSubmitting) return; // Si ya se está enviando, salir
+    isSubmitting = true; // Marcar como en proceso
+
     const customerCedula = document.getElementById('newCustomerCedula').value.trim();
     const address = document.getElementById('shippingAddress').value.trim();
     const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
@@ -646,22 +567,19 @@ async function submitInvoice() {
         const cliente = await response.json();
         customerId = cliente.id_cliente; // Extraer el ID del cliente
     } catch (error) {
-        showMessage('Error al buscar el cliente: ' + error.message);
+        alert('Error al buscar el cliente: ' + error.message);
+        isSubmitting = false; // Restablecer la bandera
         return; // Salir si no se encuentra el cliente
     }
 
     // Recoger detalles de la factura
     const detalles = Array.from(document.querySelectorAll('.invoice-item')).map(item => ({
-        id_libro: item.querySelector('.item-description').value, // ID del libro
+        id_libro: item.querySelector('.item-description').value,
         cantidad: parseFloat(item.querySelector('.item-quantity').value) || 0,
         precio_unitario: parseFloat(item.querySelector('.item-price').textContent.replace('$', '')) || 0
     }));
 
-    // Recoger otros datos
-    const descuento = 0; // Puedes modificar esto si tienes un campo de descuento
-    const impuesto = IVA_PORCENTAJE; // Usar el porcentaje de IVA definido
-    const fecha = new Date().toISOString().split('T')[0]; // Fecha actual en formato YYYY-MM-DD
-
+    // Crear objeto de factura
     const invoiceData = {
         cliente: {
             id_cliente: customerId,
@@ -669,9 +587,9 @@ async function submitInvoice() {
             direccion: address
         },
         factura: {
-            fecha: fecha,
-            descuento: descuento,
-            impuesto: impuesto,
+            fecha: new Date().toISOString().split('T')[0],
+            descuento: 0,
+            impuesto: IVA_PORCENTAJE,
             metodo_pago: paymentMethod,
             notas: notes
         },
@@ -679,6 +597,7 @@ async function submitInvoice() {
     };
 
     try {
+        // Enviar la factura a la API
         const response = await fetch('/api/factura', {
             method: 'POST',
             headers: {
@@ -692,10 +611,135 @@ async function submitInvoice() {
         }
 
         const result = await response.json();
-        showMessage('Factura creada exitosamente con ID: ' + result.id_factura);
+        alert('Factura creada exitosamente con ID: ' + result.id_factura);
         resetForm(); // Limpiar el formulario después de agregar la factura
 
     } catch (error) {
-        showMessage('Error: ' + error.message);
+        alert('Error: ' + error.message);
+    } finally {
+        isSubmitting = false; // Restablecer la bandera al final
+    }
+}
+
+
+
+
+let isSubmitting = false; // Bandera para evitar envíos múltiples
+
+document.getElementById('facturaForm').addEventListener('submit', function (e) {
+    e.preventDefault(); // Prevenir el envío del formulario
+    submitInvoice();    // Llamar a la función para enviar la factura
+});
+
+
+function validarCedula(cedula) {
+    // Verificar que la cédula tenga exactamente 10 dígitos
+    if (cedula.length !== 10 || isNaN(cedula)) {
+        return false;
+    }
+
+    // Convertir la cédula a un número
+    const provincia = parseInt(cedula.substring(0, 2), 10);
+    if (provincia < 1 || provincia > 24) {
+        return false; // La provincia debe estar entre 1 y 24
+    }
+
+    // Cálculo del dígito de verificación
+    const digitos = cedula.split('').map(Number);
+    const suma = digitos.slice(0, 9).reduce((acc, val, index) => {
+        // Aplicar el algoritmo de validación
+        if (index % 2 === 0) { // Posiciones impares (0, 2, 4, 6, 8)
+            val *= 2;
+            if (val > 9) val -= 9; // Si el resultado es mayor a 9, restar 9
+        }
+        return acc + val;
+    }, 0);
+
+    const digitoVerificacion = (10 - (suma % 10)) % 10; // Cálculo del dígito de verificación
+    return digitoVerificacion === digitos[9]; // Comparar con el dígito de verificación de la cédula
+}
+
+function validarEmail(email) {
+    // Verificar que el email no esté vacío y que contenga @
+    if (!email || !email.includes('@')) {
+        return false;
+    }
+    return true;
+}
+
+// Función para formatear automáticamente números ecuatorianos
+function formatearTelefono(input) {
+    let value = input.value.replace(/\D/g, '');
+    
+    // Formatear números ecuatorianos
+    if (value.startsWith('09') && value.length <= 10) {
+        if (value.length > 2) {
+            input.value = value.replace(/(\d{2})(\d{4})(\d{4})/, '$1 $2 $3');
+        } else {
+            input.value = value;
+        }
+    } 
+    // No formatear números extranjeros (permitir +)
+    else if (value.startsWith('+')) {
+        input.value = value;
+    }
+}
+// Asignar evento de formateo
+document.getElementById('newCustomerPhone').addEventListener('input', function() {
+    formatearTelefono(this);
+});
+
+function validarExistenciaNumeroEcuatoriano(telefono) {
+    // Limpiar y verificar formato básico
+    telefono = telefono.replace(/\D/g, '');
+    if (!/^09\d{8}$/.test(telefono)) return false;
+    // Extraer dígitos importantes
+    const segundoDigito = telefono.charAt(1);
+    const tercerDigito = telefono.charAt(2);
+    
+    // Validar según operadora
+    if (segundoDigito >= '0' && segundoDigito <= '4') {
+        // Movistar
+        return true;
+    } else if (segundoDigito >= '5' && segundoDigito <= '8') {
+        // Claro
+        return true;
+    } else if (segundoDigito === '9') {
+        if (tercerDigito === '8') {
+            // CNT
+            return true;
+        } else if (tercerDigito === '9') {
+            // Tuenti
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+async function validarTelefonoCompleto(telefono) {
+    // Limpieza inicial
+    telefono = telefono.replace(/\D/g, '');
+    
+    // Verificar si es número extranjero
+    if (telefono.startsWith('593') && telefono.length === 12) {
+        telefono = '0' + telefono.substring(3); // Convertir +593 a formato local
+    }
+    
+    // Validar formato ecuatoriano
+    if (!validarExistenciaNumeroEcuatoriano(telefono)) {
+        return false;
+    }
+    
+    // (Opcional) Verificación con API de operadora
+    try {
+        const response = await fetch(`https://api.operadora.com/validar/${telefono}`);
+        if (!response.ok) return false;
+        const data = await response.json();
+        return data.activo === true;
+    } catch (error) {
+        console.error("Error al verificar número", error);
+        // Si falla la API, confiar en la validación de formato
+        return true;
     }
 }

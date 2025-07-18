@@ -93,6 +93,48 @@
             {% endfor %}
         </tbody>
     </table>
+    {% elif tipo_reporte == 'ventas_mensuales' %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Mes</th>
+                    <th>Total Facturas</th>
+                    <th>Total Ventas ($)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fila in resultados %}
+                <tr>
+                    <td>{{ fila.mes }}</td>
+                    <td>{{ fila.total_facturas }}</td>
+                    <td>{{ "%.2f"|format(fila.total_ventas) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    {% elif tipo_reporte == 'ventas_anuales' %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Año</th>
+                    <th>Total Facturas</th>
+                    <th>Total Ventas ($)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fila in resultados %}
+                <tr>
+                    <td>{{ fila.anio }}</td>
+                    <td>{{ fila.total_facturas }}</td>
+                    <td>{{ "%.2f"|format(fila.total_ventas) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    {% else %}
+        <p>No hay datos para mostrar en el reporte.</p>
     {% endif %}
 </body>
 </html>

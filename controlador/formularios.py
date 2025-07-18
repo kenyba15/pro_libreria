@@ -3,9 +3,9 @@ from flask import Blueprint, render_template, request, redirect, url_for
 from modelo.autorDAO import obtener_autores, insertar_autor, actualizar_autor, eliminar_autor, obtener_autor_por_id
 from modelo.editorialDAO import obtener_editoriales, insertar_editorial, actualizar_editorial, eliminar_editorial, obtener_editorial_por_id
 from modelo.libroDAO import obtener_libros, insertar_libro, actualizar_libro, eliminar_libro, obtener_libro_por_id, insertar_autores_libro, actualizar_autores_libro, obtener_libros_factura
-from modelo.facturaDAO import insertar_cliente, insertar_factura, insertar_detalles_factura
+from modelo.facturaDAO import insertar_factura, insertar_detalles_factura
 from modelo.clienteDAO import insertar_cliente, obtener_clientes, actualizar_cliente, eliminar_cliente, buscar_cliente_por_cedula, obtener_cliente_por_id
-from modelo.reporteDAO import obtener_libros_baja_rotacion, obtener_libros_best_seller
+from modelo.reporteDAO import obtener_libros_baja_rotacion, obtener_libros_best_seller, obtener_ventas_mensuales, obtener_ventas_anuales
 from datetime import datetime, timedelta
 from modelo.actividadDAO import registrar_actividad, obtener_ultimas_actividades, contar_libros, contar_autores, contar_editoriales
 from flask import make_response, render_template
@@ -167,45 +167,54 @@ def ui_factura():
 def detalle_f():
     return render_template('Detalle_Factura.html')
 
+
+# API para insertar factura completa con detalles
 @form_bp.route('/api/factura', methods=['POST'])
-def api_factura():
-    data = request.get_json()
-
+def api_agregar_factura():
     try:
-        cliente_data = data['cliente']
-        factura_data = data['factura']
-        detalles = data['detalles']
+        data = request.get_json(force=True)
+        if not data:
+            return jsonify({'error': 'JSON inválido o no proporcionado'}), 400
 
-        # 1. Insertar cliente
-        id_cliente = insertar_cliente(
-            cliente_data['nombre'],
-            cliente_data['email'],
-            cliente_data['telefono'],
-            cliente_data['direccion'],
-            cliente_data['cedula']
-        )
+        cliente = data.get('cliente')
+        factura_info = data.get('factura')
+        detalles = data.get('detalles', [])
 
-        # 2. Insertar factura
-        id_factura = insertar_factura(
-            id_cliente,
-            factura_data['fecha'],
-            factura_data['descuento'],
-            factura_data['impuesto'],
-            factura_data['metodo_pago'],
-            factura_data['notas']
-        )
+        # Validaciones básicas
+        if not cliente or not factura_info or not detalles:
+            return jsonify({'error': 'Datos incompletos'}), 400
 
-        # 3. Insertar detalles de la factura
+        id_cliente = cliente.get('id_cliente')
+        fecha = factura_info.get('fecha')
+        descuento = factura_info.get('descuento', 0)
+        impuesto = factura_info.get('impuesto', 0)
+        metodo_pago = factura_info.get('metodo_pago')
+        notas = factura_info.get('notas', '')
+
+        if not all([id_cliente, fecha, metodo_pago]):
+            return jsonify({'error': 'Campos obligatorios faltantes'}), 400
+
+        # 1. Insertar factura y obtener ID
+        id_factura = insertar_factura(id_cliente, fecha, descuento, impuesto, metodo_pago, notas)
+        if not id_factura:
+            return jsonify({'error': 'Error al insertar la factura'}), 500
+
+        # 2. Validar y agregar detalles
+        for detalle in detalles:
+            if not all(k in detalle for k in ('id_libro', 'cantidad', 'precio_unitario')):
+                return jsonify({'error': 'Detalle de factura incompleto'}), 400
+
         insertar_detalles_factura(id_factura, detalles)
 
         return jsonify({
-            'mensaje': 'Factura creada exitosamente',
+            'mensaje': 'Factura y detalles insertados correctamente',
             'id_factura': id_factura
         }), 201
 
     except Exception as e:
-        print("Error:", e)
-        return jsonify({'error': 'Error al crear la factura'}), 500
+        print("❌ Error en la API:", e)
+        return jsonify({'error': 'Error interno del servidor'}), 500
+
     
     # Obtener todos los clientes
 @form_bp.route('/api/clientes', methods=['GET'])
@@ -286,17 +295,25 @@ def reportes():
 
     libros_baja_rotacion = []
     libros_best_seller = []
+    ventas_mensuales = []
+    ventas_anuales = []
+
 
     if tipo_reporte == 'baja_rotacion':
         libros_baja_rotacion = obtener_libros_baja_rotacion()
-
     elif tipo_reporte == 'best_seller':
         libros_best_seller = obtener_libros_best_seller()
+    elif tipo_reporte == 'ventas_mensuales':
+        ventas_mensuales = obtener_ventas_mensuales()
+    elif tipo_reporte == 'ventas_anuales':
+        ventas_anuales = obtener_ventas_anuales()
 
     return render_template('reportes.html',
                            tipo_reporte=tipo_reporte,
                            libros_baja_rotacion=libros_baja_rotacion,
-                           libros_best_seller=libros_best_seller)
+                           libros_best_seller=libros_best_seller,
+                           ventas_mensuales=ventas_mensuales,
+                           ventas_anuales=ventas_anuales)
 
 
 @form_bp.route('/reportes/pdf')
@@ -314,9 +331,15 @@ def generar_pdf():
     elif tipo == 'best_seller':
         resultados = obtener_libros_best_seller()
         titulo = "Reporte de Libros Best Seller"
+    elif tipo == 'ventas_mensuales':
+        resultados = obtener_ventas_mensuales()
+        titulo = "Reporte de Ventas Mensuales"
+    elif tipo == 'ventas_anuales':
+        resultados = obtener_ventas_anuales()
+        titulo = "Reporte de Ventas Anuales"
     else:
         error = "Tipo de reporte no válido."
-        return render_template('reportes.html', tipo_reporte='', libros_baja_rotacion=[], libros_best_seller=[], error=error)
+        return render_template('reportes.html', tipo_reporte='', libros_baja_rotacion=[], libros_best_seller=[], ventas_mensuales=[], ventas_anuales=[], error=error)
 
     html = render_template('reportes_pdf.html', resultados=resultados, titulo=titulo, tipo_reporte=tipo)
 
